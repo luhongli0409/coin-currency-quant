@@ -14,7 +14,7 @@ public class MineTask {
     @Autowired
     private MineService mineService;
 
-    @Scheduled(cron = "*/10 * * * * ?")
+    @Scheduled(cron = "*/5 * * * * ?")
     public void mineCurrency1() throws JobExecutionException {
         MineTask.log.info("start mining");
         //log.info(JSON.toJSONString(spotAccountAPIService.getAccountByCurrency("btc")));
