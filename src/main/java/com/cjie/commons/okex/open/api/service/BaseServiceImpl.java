@@ -1,13 +1,11 @@
 package com.cjie.commons.okex.open.api.service;
 
 import com.cjie.commons.okex.open.api.client.APIClient;
-import com.cjie.commons.okex.open.api.client.APIClient;
 import com.cjie.commons.okex.open.api.config.APIConfiguration;
 import com.cjie.commons.okex.open.api.enums.I18nEnum;
 import com.cjie.cryptocurrency.quant.mapper.APIKeyMapper;
 import com.cjie.cryptocurrency.quant.model.APIKey;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +29,7 @@ public abstract class BaseServiceImpl {
             config.setApiKey(apiKey.getApiKey());
             config.setSecretKey(apiKey.getApiSecret());
             config.setPassphrase(apiKey.getApiPassphrase());
-            config.setPrint(false);
+            config.setPrint(true);
             config.setI18n(I18nEnum.SIMPLIFIED_CHINESE);
             apiClient = new APIClient(config);
             apiClients.put(site, apiClient);
