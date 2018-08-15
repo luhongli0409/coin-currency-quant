@@ -9,12 +9,11 @@ import com.cjie.cryptocurrency.quant.model.CurrencyPair;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 
-@Component
+//@Component
 @Slf4j
 public class CurrencyPairTask {
 
@@ -24,7 +23,7 @@ public class CurrencyPairTask {
     @Scheduled(cron = "5 26 */2 * * ?")
     //@Scheduled(cron = "1 * * * * ?")
     public void currencyPair() throws Exception {
-        log.info("get huobi currency pair begin");
+        CurrencyPairTask.log.info("get huobi currency pair begin");
         HuobiApiClientFactory factory = HuobiApiClientFactory.newInstance();
         HuobiApiRestClient client = factory.newRestClient();
         List<HuobiSymbol> symbols  = client.symbols();
@@ -41,6 +40,6 @@ public class CurrencyPairTask {
             currencyPairMapper.insert(currencyPair);
         }
 
-        log.info("get huobi currency pair end");
+        CurrencyPairTask.log.info("get huobi currency pair end");
     }
 }

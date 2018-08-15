@@ -10,12 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Component
+//@Component
 @Slf4j
 public class FCoinTask {
 
@@ -36,7 +35,7 @@ public class FCoinTask {
 
             //fcoinUtils.ftusdt1("icxeth","icx","eth",0);
         }catch (Exception e){
-            log.info("==========FcoinJob发生异常============",e);
+            FCoinTask.log.info("==========FcoinJob发生异常============", e);
             throw new JobExecutionException("ftustd 方法体执行异常");
         }
     }
@@ -53,7 +52,7 @@ public class FCoinTask {
 
             //fcoinUtils.ftusdt1("icxeth","icx","eth",0);
         }catch (Exception e){
-            log.info("==========FcoinJob发生异常============",e);
+            FCoinTask.log.info("==========FcoinJob发生异常============", e);
             throw new JobExecutionException("ftustd 方法体执行异常");
         }
     }
@@ -91,7 +90,7 @@ public class FCoinTask {
                 }
             });
         }catch (Exception e){
-            log.info("==========FcoinJob 获取余额发生异常============",e);
+            FCoinTask.log.info("==========FcoinJob 获取余额发生异常============", e);
             throw new JobExecutionException("ftustd 获取余额发生异常 方法体执行异常");
         }
     }

@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class MineService {
 
     private static double initMultiple = 3;
 
-    private static double maxNum = 100;
+    private static double maxNum = 50;
 
     private static int numPrecision = 8;
 
@@ -56,10 +57,11 @@ public class MineService {
     private static final int pricePrecision = 8;
 
     static {
-        minLimitPriceOrderNums.put("eos", 0.1);
-        minLimitPriceOrderNums.put("ltc", 0.001);
-        minLimitPriceOrderNums.put("bch", 0.001);
-        minLimitPriceOrderNums.put("okb", 1.0);
+        MineService.minLimitPriceOrderNums.put("eos", 0.1);
+        MineService.minLimitPriceOrderNums.put("ltc", 0.001);
+        MineService.minLimitPriceOrderNums.put("bch", 0.001);
+        MineService.minLimitPriceOrderNums.put("okb", 1.0);
+        MineService.minLimitPriceOrderNums.put("cac", 1.0);
     }
 
 
@@ -75,6 +77,8 @@ public class MineService {
     public void mine1(String site, String baseName, String quotaName, double increment) throws Exception {
         String symbol = baseName.toUpperCase() + "-" + quotaName.toUpperCase();
 
+        cancelOrders(site, getNotTradeOrders(site, symbol, "0", "100"));
+
         //查询余额
         Account baseAccount = getBalance(site, baseName);
         double baseHold = new BigDecimal(baseAccount.getBalance()).doubleValue() - new BigDecimal(baseAccount.getAvailable()).doubleValue();
@@ -87,31 +91,22 @@ public class MineService {
 
 
         //判断是否有冻结的，如果冻结太多冻结就休眠，进行下次挖矿
-        if (baseHold > 0.099 * baseBalance
-                || quotaHold > 0.099 * quotaBalance) {
+        if (baseHold > 0.3 * baseBalance
+                && quotaHold > 0.3 * quotaBalance) {
             return;
         }
 
-        log.info("===============balance: base:{},quota:{}========================", baseBalance, quotaBalance);
+        MineService.log.info("===============balance: base:{},quota:{}========================", baseBalance, quotaBalance);
 
         Ticker ticker = getTicker(site, baseName, quotaName);
         Double marketPrice = Double.parseDouble(ticker.getLast());
-        log.info("ticker last {} -{}:{}", baseName, quotaName, marketPrice);
-        //usdt小于51并且ft的价值小于51
-//        if ((usdt < (minUsdt + 1) && ft < ((minUsdt + 1) / marketPrice))
-//                || (usdt < (minUsdt + 1) && Math.abs(ft * marketPrice - usdt) < minUsdt / 5)
-//                || (ft < ((minUsdt + 1) / marketPrice) && Math.abs(ft * marketPrice - usdt) < minUsdt / 5)) {
-//            logger.info("跳出循环，ustd:{}, marketPrice:{}", usdt, marketPrice);
-//            return;
-//        }
-
-        //ft:usdt=1:0.6
-        double initUsdt = maxNum * initMultiple * marketPrice;
+        MineService.log.info("ticker last {} -{}:{}", baseName, quotaName, marketPrice);
+        double initUsdt = MineService.maxNum * MineService.initMultiple * marketPrice;
 //
         //初始化
         if (!(baseHold > 0 || quotaHold > 0)) {
             if (isHaveInitBuyAndSell(site, baseBalance - baseHold, quotaBalance - quotaHold, marketPrice, initUsdt, symbol, "limit", increment)) {
-                log.info("================有进行初始化均衡操作=================");
+                MineService.log.info("================有进行初始化均衡操作=================");
                 return;
             }
         }
@@ -120,24 +115,24 @@ public class MineService {
         double price = Math.min((baseBalance - baseHold) * marketPrice, quotaBalance - quotaHold);
 
         BigDecimal baseAmount = getNum(price * 0.99 / marketPrice);//预留点来扣手续费
-        if (baseAmount.doubleValue() - minLimitPriceOrderNums.get(baseName.toLowerCase()) < 0) {
-            log.info("小于最小限价数量");
+        if (baseAmount.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) < 0) {
+            MineService.log.info("小于最小限价数量");
             return;
         }
 
-        log.info("=============================交易对开始=========================");
+        MineService.log.info("=============================交易对开始=========================");
 //
         try {
-            buyNotLimit(site, symbol, "limit", baseAmount, getMarketPrice(marketPrice * (1 - increment)));
+            buyNotLimit(site, symbol, "limit", baseAmount, MineService.getMarketPrice(marketPrice * (1 - increment)));
         } catch (Exception e) {
-            log.error("交易对买出错", e);
+            MineService.log.error("交易对买出错", e);
         }
         try {
-            sellNotLimit(site, symbol, "limit", baseAmount, getMarketPrice(marketPrice * (1 + increment)));
+            sellNotLimit(site, symbol, "limit", baseAmount, MineService.getMarketPrice(marketPrice * (1 + increment)));
         } catch (Exception e) {
-            log.error("交易对卖出错", e);
+            MineService.log.error("交易对卖出错", e);
         }
-        log.info("=============================交易对结束=========================");
+        MineService.log.info("=============================交易对结束=========================");
 
     }
 
@@ -170,47 +165,47 @@ public class MineService {
 
         Ticker ticker = getTicker(site, baseName, quotaName);
         Double marketPrice = Double.parseDouble(ticker.getLast());
-        log.info("ticker last {} -{}:{}", baseName, quotaName, marketPrice);
+        MineService.log.info("ticker last {} -{}:{}", baseName, quotaName, marketPrice);
 
 
         double allAsset= baseBalance * marketPrice + quotaBalance;
-        log.info("basebalance:{}, qutobalance:{}, allAsset:{}, asset/2:{}, basebalance-quota:{}",
+        MineService.log.info("basebalance:{}, qutobalance:{}, allAsset:{}, asset/2:{}, basebalance-quota:{}",
                 baseBalance, quotaBalance, allAsset, allAsset*baseRatio, baseBalance * marketPrice );
 
         BigDecimal quotaChange = null;
         BigDecimal baseChange = null;
         if (allAsset*baseRatio - baseBalance * marketPrice  > allAsset * increment) {
-            BigDecimal amount = new BigDecimal(allAsset*baseRatio -baseBalance* marketPrice).setScale(numPrecision, BigDecimal.ROUND_FLOOR);
-            log.info("basebalance:{}, quotabalance:{}", baseBalance + amount.doubleValue(),
-                    quotaBalance - amount.doubleValue() * getMarketPrice(marketPrice).doubleValue());
-            log.info("buy {}, price:{}", amount, marketPrice);
+            BigDecimal amount = new BigDecimal(allAsset * baseRatio - baseBalance * marketPrice).setScale(MineService.numPrecision, BigDecimal.ROUND_FLOOR);
+            MineService.log.info("basebalance:{}, quotabalance:{}", baseBalance + amount.doubleValue(),
+                    quotaBalance - amount.doubleValue() * MineService.getMarketPrice(marketPrice).doubleValue());
+            MineService.log.info("buy {}, price:{}", amount, marketPrice);
             //买入
-            if (amount.doubleValue() - minLimitPriceOrderNums.get(baseName.toLowerCase()) * marketPrice < 0) {
-                log.info("小于最小限价数量");
+            if (amount.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) * marketPrice < 0) {
+                MineService.log.info("小于最小限价数量");
             } else {
                 BigDecimal baseamount = amount.divide(new BigDecimal(marketPrice),
-                        numPrecision, BigDecimal.ROUND_DOWN);
-                quotaChange = baseamount.multiply(getMarketPrice(marketPrice)).negate();
+                        MineService.numPrecision, BigDecimal.ROUND_DOWN);
+                quotaChange = baseamount.multiply(MineService.getMarketPrice(marketPrice)).negate();
                 baseChange = baseamount;
-                buy(site, symbol, "limit", baseamount , getMarketPrice(marketPrice));//此处不需要重试，让上次去判断余额后重新平衡
+                buy(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice));//此处不需要重试，让上次去判断余额后重新平衡
             }
         }
 
 
         if (baseBalance * marketPrice - allAsset * baseRatio > allAsset * increment) {
             //卖出
-            BigDecimal amount = new BigDecimal(baseBalance* marketPrice-allAsset * baseRatio).setScale(numPrecision, BigDecimal.ROUND_FLOOR);
-            log.info("basebalance:{}, quotabalance:{}", baseBalance - amount.doubleValue(),
-                    quotaBalance + amount.doubleValue() * getMarketPrice(marketPrice).doubleValue());
-            log.info("sell {}, price:{}", amount, marketPrice);
-            if (amount.doubleValue() - minLimitPriceOrderNums.get(baseName.toLowerCase()) * marketPrice < 0) {
-                log.info("小于最小限价数量");
+            BigDecimal amount = new BigDecimal(baseBalance * marketPrice - allAsset * baseRatio).setScale(MineService.numPrecision, BigDecimal.ROUND_FLOOR);
+            MineService.log.info("basebalance:{}, quotabalance:{}", baseBalance - amount.doubleValue(),
+                    quotaBalance + amount.doubleValue() * MineService.getMarketPrice(marketPrice).doubleValue());
+            MineService.log.info("sell {}, price:{}", amount, marketPrice);
+            if (amount.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) * marketPrice < 0) {
+                MineService.log.info("小于最小限价数量");
             } else {
                 BigDecimal baseamount = amount.divide(new BigDecimal(marketPrice),
-                        numPrecision, BigDecimal.ROUND_DOWN);
-                quotaChange = baseamount.multiply(getMarketPrice(marketPrice));
+                        MineService.numPrecision, BigDecimal.ROUND_DOWN);
+                quotaChange = baseamount.multiply(MineService.getMarketPrice(marketPrice));
                 baseChange = baseamount.negate();
-                sell(site, symbol, "limit", baseamount, getMarketPrice(marketPrice));//此处不需要重试，让上次去判断余额后重新平衡
+                sell(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice));//此处不需要重试，让上次去判断余额后重新平衡
 
             }
 
@@ -222,6 +217,10 @@ public class MineService {
             return false;
         }
         for (OrderInfo orderInfo : orderIds) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            if (System.currentTimeMillis() - 8 * 3600 * 1000 - dateFormat.parse(orderInfo.getCreated_at()).getTime() < 1800 * 1000) {
+                continue;
+            }
             PlaceOrderParam placeOrderParam = new PlaceOrderParam();
             placeOrderParam.setProduct_id(orderInfo.getProduct_id());
             spotOrderAPIService.cancleOrderByOrderId(site, placeOrderParam, orderInfo.getOrder_id());
@@ -242,25 +241,25 @@ public class MineService {
         double baseValue = base * marketPrice;
         double num = Math.min((Math.abs(quota - baseValue) / 2), initUsdt);
         BigDecimal b = getNum(num / marketPrice);//现价的数量都为ft的数量
-        if (b.doubleValue() - minLimitPriceOrderNums.get(symbol.split("-")[0].toLowerCase()) < 0) {
-            log.info("小于最小限价数量");
+        if (b.doubleValue() - MineService.minLimitPriceOrderNums.get(symbol.split("-")[0].toLowerCase()) < 0) {
+            MineService.log.info("小于最小限价数量");
             return false;
         }
         if (baseValue < quota && Math.abs(baseValue - quota) > 0.1 * (baseValue + quota)) {
             //买ft
             try {
-                buy(site, symbol, type, b, getMarketPrice(marketPrice * (1-increment)));//此处不需要重试，让上次去判断余额后重新平衡
+                buy(site, symbol, type, b, MineService.getMarketPrice(marketPrice * (1 - increment)));//此处不需要重试，让上次去判断余额后重新平衡
             } catch (Exception e) {
-                log.error("初始化买有异常发生", e);
+                MineService.log.error("初始化买有异常发生", e);
                 throw new Exception(e);
             }
 
         } else if (quota < baseValue && Math.abs(baseValue - quota) > 0.1 * (baseValue + quota)) {
             //卖ft
             try {
-                sell(site, symbol, type, b, getMarketPrice(marketPrice*(1+increment)));//此处不需要重试，让上次去判断余额后重新平衡
+                sell(site, symbol, type, b, MineService.getMarketPrice(marketPrice * (1 + increment)));//此处不需要重试，让上次去判断余额后重新平衡
             } catch (Exception e) {
-                log.error("初始化卖有异常发生", e);
+                MineService.log.error("初始化卖有异常发生", e);
                 throw new Exception(e);
             }
         } else {
@@ -272,7 +271,7 @@ public class MineService {
     }
 
     public void buy(String site, String symbol, String type, BigDecimal amount, BigDecimal marketPrice) throws Exception {
-        BigDecimal maxNumDeci = getNum(maxNum);
+        BigDecimal maxNumDeci = getNum(MineService.maxNum);
         while (amount.doubleValue() > 0) {
             if (amount.compareTo(maxNumDeci) > 0) {
                 subBuy(site, maxNumDeci.toString(), marketPrice.toString(), symbol, type, marketPrice.toPlainString());
@@ -288,7 +287,7 @@ public class MineService {
     }
 
     public void sell(String site, String symbol, String type, BigDecimal amount, BigDecimal marketPrice) throws Exception {
-        BigDecimal maxNumDeci = getNum(maxNum);
+        BigDecimal maxNumDeci = getNum(MineService.maxNum);
         while (amount.doubleValue() > 0) {
             if (amount.compareTo(maxNumDeci) > 0) {
                 subSell(site, maxNumDeci.toString(), marketPrice.toString(), symbol, type, marketPrice.toPlainString());
@@ -324,14 +323,14 @@ public class MineService {
     }
 
     public static BigDecimal getMarketPrice(double marketPrice) {
-        return getBigDecimal(marketPrice, pricePrecision);
+        return MineService.getBigDecimal(marketPrice, MineService.pricePrecision);
     }
 
     public static BigDecimal getBigDecimal(double value, int scale) {
         return new BigDecimal(value).setScale(scale, BigDecimal.ROUND_HALF_UP);
     }
     public BigDecimal getNum(double b) {//为了尽量能够成交，数字向下精度
-        return new BigDecimal(b).setScale(numPrecision, BigDecimal.ROUND_DOWN);
+        return new BigDecimal(b).setScale(MineService.numPrecision, BigDecimal.ROUND_DOWN);
     }
     public Account getBalance(String site, String currency) throws Exception {
 
@@ -352,7 +351,7 @@ public class MineService {
         client.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         ResponseEntity<String> response = client.exchange(url, HttpMethod.GET, requestEntity, String.class);
         String body = response.getBody();
-        log.info(body);
+        MineService.log.info(body);
         return JSON.parseObject(body,Ticker.class);
 
         //return spotProductAPIService.getTickerByProductId(baseCurrency.toUpperCase() + "-" + quotaCurrency.toUpperCase());

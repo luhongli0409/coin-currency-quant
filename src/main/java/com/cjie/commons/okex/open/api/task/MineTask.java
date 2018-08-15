@@ -14,31 +14,31 @@ public class MineTask {
     @Autowired
     private MineService mineService;
 
-    //@Scheduled(cron = "* */2 * * * ?")
+    @Scheduled(cron = "*/15 * * * * ?")
     public void mineCurrency1() throws JobExecutionException {
-        log.info("start mining");
+        MineTask.log.info("start mining");
         //log.info(JSON.toJSONString(spotAccountAPIService.getAccountByCurrency("btc")));
         try {
-            mineService.mine1("oktop","cac", "eth", 0.005);
+            mineService.mine1("coinall", "cac", "usdt", 0.002);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        log.info("end mining");
+        MineTask.log.info("end mining");
 
 
     }
-    @Scheduled(cron = "2 */1 * * * ?")
-    public void mineCurrency3() throws JobExecutionException {
-        log.info("start mining");
-        //log.info(JSON.toJSONString(spotAccountAPIService.getAccountByCurrency("btc")));
-        try {
-            mineService.mine3("oktop","bch", "eth", 0.005, 0.5);
-            //mineService.mine3("cac", "eth", 0.005);
-        } catch (Exception e) {
-            log.error("error mining", e);
-        }
-        log.info("end mining");
-
-
-    }
+//    @Scheduled(cron = "2 */1 * * * ?")
+//    public void mineCurrency3() throws JobExecutionException {
+//        MineTask.log.info("start mining");
+//        //log.info(JSON.toJSONString(spotAccountAPIService.getAccountByCurrency("btc")));
+//        try {
+//            mineService.mine3("coinall", "okb", "usdt", 0.005, 0.5);
+//            //mineService.mine3("cac", "eth", 0.005);
+//        } catch (Exception e) {
+//            MineTask.log.error("error mining", e);
+//        }
+//        MineTask.log.info("end mining");
+//
+//
+//    }
 }
