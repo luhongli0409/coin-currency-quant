@@ -7,6 +7,7 @@ import com.cjie.commons.okex.open.api.enums.HttpHeadersEnum;
 import com.cjie.commons.okex.open.api.exception.APIException;
 import com.cjie.commons.okex.open.api.utils.DateUtils;
 import com.cjie.commons.okex.open.api.utils.HmacSHA256Base64Utils;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okio.Buffer;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0.0
  * @date 2018/3/8 14:14
  */
+@Slf4j
 public class APIHttpClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIHttpClient.class);
@@ -64,6 +66,7 @@ public class APIHttpClient {
         clientBuilder.addInterceptor((Interceptor.Chain chain) -> {
             Request.Builder requestBuilder = chain.request().newBuilder();
             String timestamp = DateUtils.getUnixTime();
+            APIHttpClient.log.info("apply request timestamps: {} ", timestamp);
             requestBuilder.headers(headers(chain.request(), timestamp));
             Request request = requestBuilder.build();
             if (this.config.isPrint()) {
@@ -175,6 +178,6 @@ public class APIHttpClient {
         requestInfo.append("\n\t\t").append("Body: ").append(body);
         String preHash = HmacSHA256Base64Utils.preHash(timestamp, method, requestPath, queryString, body);
         requestInfo.append("\n\t\t").append("preHash: ").append(preHash);
-        LOG.info(requestInfo.toString());
+        APIHttpClient.LOG.info(requestInfo.toString());
     }
 }
