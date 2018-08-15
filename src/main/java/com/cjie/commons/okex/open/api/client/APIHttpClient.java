@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -65,7 +66,8 @@ public class APIHttpClient {
         clientBuilder.retryOnConnectionFailure(this.config.isRetryOnConnectionFailure());
         clientBuilder.addInterceptor((Interceptor.Chain chain) -> {
             Request.Builder requestBuilder = chain.request().newBuilder();
-            String timestamp = DateUtils.getUnixTime();
+            //String timestamp = DateUtils.getUnixTime();
+            String timestamp = DateUtils.timeToCTSString(new Date());
             APIHttpClient.log.info("apply request timestamps: {} ", timestamp);
             requestBuilder.headers(headers(chain.request(), timestamp));
             Request request = requestBuilder.build();

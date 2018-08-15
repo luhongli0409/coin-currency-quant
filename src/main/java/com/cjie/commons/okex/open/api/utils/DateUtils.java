@@ -55,39 +55,39 @@ public class DateUtils {
         String timeStyle = null;
         switch (style) {
             case 1: {
-                timeStyle = TIME_STYLE_S1;
+                timeStyle = DateUtils.TIME_STYLE_S1;
                 break;
             }
             case 2: {
-                timeStyle = TIME_STYLE_S2;
+                timeStyle = DateUtils.TIME_STYLE_S2;
                 break;
             }
             case 3: {
-                timeStyle = TIME_STYLE_S3;
+                timeStyle = DateUtils.TIME_STYLE_S3;
                 break;
             }
             case 4: {
-                timeStyle = TIME_STYLE_S4;
+                timeStyle = DateUtils.TIME_STYLE_S4;
                 break;
             }
             case 5: {
-                timeStyle = TIME_STYLE_S5;
+                timeStyle = DateUtils.TIME_STYLE_S5;
                 break;
             }
             case 6: {
-                timeStyle = TIME_STYLE_S6;
+                timeStyle = DateUtils.TIME_STYLE_S6;
                 break;
             }
             case 7: {
-                timeStyle = TIME_STYLE_S7;
+                timeStyle = DateUtils.TIME_STYLE_S7;
                 break;
             }
             case 8: {
-                SimpleDateFormat sdf = (SimpleDateFormat) SDF.clone();
+                SimpleDateFormat sdf = (SimpleDateFormat) DateUtils.SDF.clone();
                 return sdf.format(time);
             }
             case 9: {
-                return getEpochTime(time);
+                return DateUtils.getEpochTime(time);
             }
             default: {
                 return time.toString();
@@ -102,7 +102,7 @@ public class DateUtils {
      * @param time Date object, if time=null, returns null.
      */
     public static String timeToStringNull(Date time, int style) {
-        return time == null ? null : timeToString(time, style);
+        return time == null ? null : DateUtils.timeToString(time, style);
     }
 
     /**
@@ -135,7 +135,7 @@ public class DateUtils {
         if (StringUtils.isEmpty(utcTime)) {
             return null;
         }
-        SimpleDateFormat sdfi = (SimpleDateFormat) SDF.clone();
+        SimpleDateFormat sdfi = (SimpleDateFormat) DateUtils.SDF.clone();
         return sdfi.parse(utcTime);
     }
 
@@ -153,7 +153,17 @@ public class DateUtils {
 
     public static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
 
+    public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+
     static {
-        SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
+        DateUtils.SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    public static String timeToCTSString(Date time) {
+        if (time == null) {
+            time = new Date();
+        }
+        SimpleDateFormat sdf = (SimpleDateFormat) DateUtils.format.clone();
+        return sdf.format(time);
     }
 }
