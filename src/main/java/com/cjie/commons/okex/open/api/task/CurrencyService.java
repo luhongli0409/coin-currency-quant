@@ -3,6 +3,7 @@ package com.cjie.commons.okex.open.api.task;
 import com.cjie.commons.okex.open.api.bean.spot.result.Account;
 import com.cjie.commons.okex.open.api.bean.spot.result.Ticker;
 import com.cjie.commons.okex.open.api.service.spot.SpotAccountAPIService;
+import com.cjie.commons.okex.open.api.utils.WXInfoUtils;
 import com.cjie.cryptocurrency.quant.mapper.CurrencyBalanceMapper;
 import com.cjie.cryptocurrency.quant.model.CurrencyBalance;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class CurrencyService {
     private SpotAccountAPIService spotAccountAPIService;
 
     public void currency(String site, String baseName, String quotaName) throws Exception {
+        String symbol = baseName.toUpperCase() + "-" + quotaName.toUpperCase();
         //查询余额
         Account baseAccount = getBalance(site, baseName);
         double baseHold = new BigDecimal(baseAccount.getBalance()).doubleValue() - new BigDecimal(baseAccount.getAvailable()).doubleValue();
@@ -52,6 +54,9 @@ public class CurrencyService {
                 .modifyTime(new Date())
                 .build();
         currencyBalanceMapper.insert(currencyBalance);
+        String text = "币对" + symbol + "余额";
+        String desp = balance.toString();
+        WXInfoUtils.sendInfo(text, desp);
 
     }
 
