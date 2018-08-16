@@ -45,8 +45,8 @@ public class CurrencyService {
 
         BigDecimal balance = new BigDecimal(baseBalance).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaBalance));
 
-        String text = "币对" + baseName.toUpperCase() + quotaName.toUpperCase() + "余额";
-        String desp = "$ " + balance.setScale(8, RoundingMode.HALF_UP).toString();
+        String text = site;
+        String desp = "币对" + baseName.toUpperCase() + quotaName.toUpperCase() + "余额$ " + balance.setScale(8, RoundingMode.HALF_UP).toString();
         WXInfoUtils.sendInfo(text, desp);
 
         CurrencyService.log.info("add user currency");
