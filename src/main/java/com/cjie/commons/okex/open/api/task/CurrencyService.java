@@ -27,7 +27,7 @@ public class CurrencyService {
     private SpotAccountAPIService spotAccountAPIService;
 
     public void currency(String site, String baseName, String quotaName) throws Exception {
-        String symbol = baseName.toUpperCase() + "-" + quotaName.toUpperCase();
+
         //查询余额
         Account baseAccount = getBalance(site, baseName);
         double baseHold = new BigDecimal(baseAccount.getBalance()).doubleValue() - new BigDecimal(baseAccount.getAvailable()).doubleValue();
@@ -54,6 +54,7 @@ public class CurrencyService {
                 .modifyTime(new Date())
                 .build();
         currencyBalanceMapper.insert(currencyBalance);
+        String symbol = baseName.toUpperCase() + "/" + quotaName.toUpperCase();
         String text = "币对" + symbol + "余额";
         String desp = balance.setScale(8).toString();
         WXInfoUtils.sendInfo(text, desp);
