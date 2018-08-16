@@ -60,7 +60,7 @@ public class MineService {
         MineService.minLimitPriceOrderNums.put("eos", 0.1);
         MineService.minLimitPriceOrderNums.put("ltc", 0.001);
         MineService.minLimitPriceOrderNums.put("bch", 0.001);
-        MineService.minLimitPriceOrderNums.put("okb", 1.0);
+        MineService.minLimitPriceOrderNums.put("okb", 0.5);
         MineService.minLimitPriceOrderNums.put("cac", 1.0);
     }
 
