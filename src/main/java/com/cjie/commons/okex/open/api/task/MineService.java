@@ -113,7 +113,7 @@ public class MineService {
 //
         //买单 卖单
         double price = Math.min((baseBalance - baseHold) * marketPrice, quotaBalance - quotaHold);
-
+        MineService.log.info("apply trade price is :{}", price);
         BigDecimal baseAmount = getNum(Math.min(price * 0.99 / marketPrice, MineService.maxNum));//预留点来扣手续费
         MineService.log.info("apply trade amount is :{}", baseAmount);
         if (baseAmount.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) < 0) {
