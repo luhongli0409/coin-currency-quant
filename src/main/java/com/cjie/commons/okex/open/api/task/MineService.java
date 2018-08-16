@@ -116,12 +116,13 @@ public class MineService {
         } else {
             //判断是否有冻结的，如果冻结太多冻结就休眠，进行下次挖矿
             if (quotaHold > 0.3 * quotaBalance) {
-                return;
-            }
-            try {
-                buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, MineService.getMarketPrice(marketPrice * (1 - increment)));
-            } catch (Exception e) {
-                MineService.log.error("交易对买出错", e);
+                MineService.log.info("quotaHold > 0.3 * quotaBalance");
+            } else {
+                try {
+                    buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, MineService.getMarketPrice(marketPrice * (1 - increment)));
+                } catch (Exception e) {
+                    MineService.log.error("交易对买出错", e);
+                }
             }
         }
 
@@ -136,12 +137,13 @@ public class MineService {
         } else {
             //判断是否有冻结的，如果冻结太多冻结就休眠，进行下次挖矿
             if (baseHold > 0.3 * baseBalance) {
-                return;
-            }
-            try {
-                sellNotLimit(site, symbol, "limit", baseAmountSell, MineService.getMarketPrice(marketPrice * (1 + increment)));
-            } catch (Exception e) {
-                MineService.log.error("交易对卖出错", e);
+                MineService.log.info("baseHold > 0.3 * baseBalance");
+            } else {
+                try {
+                    sellNotLimit(site, symbol, "limit", baseAmountSell, MineService.getMarketPrice(marketPrice * (1 + increment)));
+                } catch (Exception e) {
+                    MineService.log.error("交易对卖出错", e);
+                }
             }
         }
         MineService.log.info("=============================交易对结束=========================");
