@@ -300,7 +300,7 @@ public class MineService {
             return false;
         }
         for (OrderInfo orderInfo : orderIds) {
-            MineService.log.info("orderInfo :{}", orderInfo);
+//            MineService.log.info("orderInfo :{}", orderInfo);
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             if (System.currentTimeMillis() - 8 * 3600 * 1000 - dateFormat.parse(orderInfo.getCreated_at()).getTime() < 20 * 60 * 1000) {
                 continue;
