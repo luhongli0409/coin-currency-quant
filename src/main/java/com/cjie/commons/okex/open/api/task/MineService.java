@@ -113,34 +113,34 @@ public class MineService {
 
         MineService.log.info("=============================交易对开始=========================");
         //买单
-        double priceBuy = (baseBalance - baseHold) * marketPrice;
+        double priceBuy = quotaBalance - quotaHold;
         MineService.log.info("apply trade buy price is :{}", priceBuy);
         BigDecimal baseAmountpriceBuy = getNum(Math.min(priceBuy * 0.99 / marketPrice, MineService.maxNum));//预留点来扣手续费
         MineService.log.info("apply trade buy amount is :{}", baseAmountpriceBuy);
         if (baseAmountpriceBuy.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) < 0) {
             MineService.log.info("小于最小限价数量buy :   {}", baseAmountpriceBuy.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()));
-            return;
-        }
-        try {
-            buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, MineService.getMarketPrice(marketPrice * (1 - increment)));
-        } catch (Exception e) {
-            MineService.log.error("交易对买出错", e);
+        } else {
+            try {
+                buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, MineService.getMarketPrice(marketPrice * (1 - increment)));
+            } catch (Exception e) {
+                MineService.log.error("交易对买出错", e);
+            }
         }
 
 
         //卖单
-        double priceSell = quotaBalance - quotaHold;
+        double priceSell = (baseBalance - baseHold) * marketPrice;
         MineService.log.info("apply trade sell price is :{}", priceSell);
         BigDecimal baseAmountSell = getNum(Math.min(priceSell * 0.99 / marketPrice, MineService.maxNum));//预留点来扣手续费
         MineService.log.info("apply trade sell amount is :{}", baseAmountSell);
         if (baseAmountSell.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) < 0) {
             MineService.log.info("小于最小限价数量sell :   {}", baseAmountSell.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()));
-            return;
-        }
-        try {
-            sellNotLimit(site, symbol, "limit", baseAmountSell, MineService.getMarketPrice(marketPrice * (1 + increment)));
-        } catch (Exception e) {
-            MineService.log.error("交易对卖出错", e);
+        } else {
+            try {
+                sellNotLimit(site, symbol, "limit", baseAmountSell, MineService.getMarketPrice(marketPrice * (1 + increment)));
+            } catch (Exception e) {
+                MineService.log.error("交易对卖出错", e);
+            }
         }
         MineService.log.info("=============================交易对结束=========================");
 
