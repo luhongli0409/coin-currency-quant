@@ -66,7 +66,7 @@ public class APIHttpClient {
         clientBuilder.addInterceptor((Interceptor.Chain chain) -> {
             Request.Builder requestBuilder = chain.request().newBuilder();
             String timestamp = DateUtils.getUnixTime();
-            APIHttpClient.log.info("apply request timestamps: {} ", timestamp);
+            //APIHttpClient.log.info("apply request timestamps: {} ", timestamp);
             requestBuilder.headers(headers(chain.request(), timestamp));
             Request request = requestBuilder.build();
             if (this.config.isPrint()) {
