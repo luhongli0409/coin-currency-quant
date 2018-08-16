@@ -196,9 +196,9 @@ public class MineService {
         }
 //
         //买单 卖单
-        double price = Math.min((baseBalance - baseHold) * marketPrice, quotaBalance - quotaHold);
+        double price = Math.min((baseBalance - baseHold) * marketPrice, (quotaBalance - quotaHold) / 2);
 
-        BigDecimal baseAmount = getNum(Math.min(price * 0.99 / marketPrice, MineService.maxNum));//预留点来扣手续费
+        BigDecimal baseAmount = getNum(price * 0.99 / marketPrice);//预留点来扣手续费
         if (baseAmount.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) < 0) {
             MineService.log.info("小于最小限价数量");
             return;
