@@ -43,7 +43,7 @@ public class CurrencyService {
 
         BigDecimal hold = new BigDecimal(baseHold).multiply(new BigDecimal(marketPrice).add(new BigDecimal(quotaHold)));
 
-        BigDecimal balance = new BigDecimal(baseBalance + baseHold).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaBalance + quotaHold));
+        BigDecimal balance = new BigDecimal(baseBalance).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaBalance));
 
         String text = "币对" + baseName.toUpperCase() + quotaName.toUpperCase() + "余额";
         String desp = "$ " + balance.setScale(8, RoundingMode.HALF_UP).toString();
