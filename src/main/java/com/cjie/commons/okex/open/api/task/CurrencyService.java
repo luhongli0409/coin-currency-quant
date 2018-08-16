@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 @Component
@@ -45,7 +46,7 @@ public class CurrencyService {
         BigDecimal balance = new BigDecimal(baseBalance + baseHold).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaBalance + quotaHold));
 
         String text = "币对" + baseName.toUpperCase() + quotaName.toUpperCase() + "余额";
-        String desp = "$ " + balance.setScale(8).toString();
+        String desp = "$ " + balance.setScale(8, RoundingMode.HALF_UP).toString();
         WXInfoUtils.sendInfo(text, desp);
 
         CurrencyService.log.info("add user currency");
