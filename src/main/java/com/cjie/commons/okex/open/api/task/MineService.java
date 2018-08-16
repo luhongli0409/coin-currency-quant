@@ -151,6 +151,75 @@ public class MineService {
     }
 
     /**
+     * 自买自卖交易
+     *
+     * @param baseName  交易币名称
+     * @param quotaName 市场币名称
+     * @param increment 收益率一半
+     * @throws Exception
+     */
+    public void mine2(String site, String baseName, String quotaName, double increment) throws Exception {
+        String symbol = baseName.toUpperCase() + "-" + quotaName.toUpperCase();
+
+        cancelOrders(site, getNotTradeOrders(site, symbol, "0", "100"));
+
+        //查询余额
+        Account baseAccount = getBalance(site, baseName);
+        double baseHold = new BigDecimal(baseAccount.getBalance()).doubleValue() - new BigDecimal(baseAccount.getAvailable()).doubleValue();
+        double baseBalance = new BigDecimal(baseAccount.getBalance()).doubleValue();
+
+
+        Account quotaAccount = getBalance(site, quotaName);
+        double quotaHold = new BigDecimal(quotaAccount.getBalance()).doubleValue() - new BigDecimal(quotaAccount.getAvailable()).doubleValue();
+        double quotaBalance = new BigDecimal(quotaAccount.getBalance()).doubleValue();
+
+
+        //判断是否有冻结的，如果冻结太多冻结就休眠，进行下次挖矿
+        if (baseHold > 0.3 * baseBalance
+                && quotaHold > 0.3 * quotaBalance) {
+            return;
+        }
+
+        MineService.log.info("===============balance: base:{},quota:{}========================", baseBalance, quotaBalance);
+
+        Ticker ticker = getTicker(site, baseName, quotaName);
+        Double marketPrice = Double.parseDouble(ticker.getLast());
+        MineService.log.info("ticker last {} -{}:{}", baseName, quotaName, marketPrice);
+        double initUsdt = MineService.maxNum * MineService.initMultiple * marketPrice;
+//
+        //初始化
+        if (!(baseHold > 0 || quotaHold > 0)) {
+            if (isHaveInitBuyAndSell(site, baseBalance - baseHold, quotaBalance - quotaHold, marketPrice, initUsdt, symbol, "limit", increment)) {
+                MineService.log.info("================有进行初始化均衡操作=================");
+                return;
+            }
+        }
+//
+        //买单 卖单
+        double price = Math.min((baseBalance - baseHold) * marketPrice, quotaBalance - quotaHold);
+
+        BigDecimal baseAmount = getNum(Math.min(price * 0.99 / marketPrice, MineService.maxNum));//预留点来扣手续费
+        if (baseAmount.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) < 0) {
+            MineService.log.info("小于最小限价数量");
+            return;
+        }
+
+        MineService.log.info("=============================交易对开始=========================");
+        try {
+            buyNotLimit(site, symbol, "limit", baseAmount, MineService.getMarketPrice(marketPrice * (1 - increment)));
+        } catch (Exception e) {
+            MineService.log.error("交易对买出错", e);
+        }
+        try {
+            sellNotLimit(site, symbol, "limit", baseAmount, MineService.getMarketPrice(marketPrice * (1 + increment)));
+        } catch (Exception e) {
+            MineService.log.error("交易对卖出错", e);
+        }
+        MineService.log.info("=============================交易对结束=========================");
+
+    }
+
+    /**
      * 动态调整策略
      *
      * @param baseName    交易币名称
