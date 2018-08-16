@@ -18,8 +18,7 @@ public class MineTask {
     public void mineCurrency1() throws JobExecutionException {
         MineTask.log.info("start mining");
         try {
-            //mineService.mine2("coinall", "cac", "usdt", 0.002);
-            //mineService.mine2("coinall", "okb", "btc", 0.002);
+            mineService.mine2("coinall", "cac", "usdt", 0.002);
         } catch (Exception e) {
             e.printStackTrace();
         }
