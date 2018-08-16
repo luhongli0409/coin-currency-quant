@@ -90,12 +90,6 @@ public class MineService {
         double quotaBalance = new BigDecimal(quotaAccount.getBalance()).doubleValue();
 
 
-        //判断是否有冻结的，如果冻结太多冻结就休眠，进行下次挖矿
-//        if (baseHold > 0.3 * baseBalance
-//                && quotaHold > 0.3 * quotaBalance) {
-//            return;
-//        }
-
         MineService.log.info("===============balance: base:{},quota:{}========================", baseBalance, quotaBalance);
 
         Ticker ticker = getTicker(site, baseName, quotaName);
@@ -120,6 +114,10 @@ public class MineService {
         if (baseAmountpriceBuy.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) < 0) {
             MineService.log.info("小于最小限价数量buy :   {}", baseAmountpriceBuy.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()));
         } else {
+            //判断是否有冻结的，如果冻结太多冻结就休眠，进行下次挖矿
+            if (quotaHold > 0.3 * quotaBalance) {
+                return;
+            }
             try {
                 buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, MineService.getMarketPrice(marketPrice * (1 - increment)));
             } catch (Exception e) {
@@ -136,6 +134,10 @@ public class MineService {
         if (baseAmountSell.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()) < 0) {
             MineService.log.info("小于最小限价数量sell :   {}", baseAmountSell.doubleValue() - MineService.minLimitPriceOrderNums.get(baseName.toLowerCase()));
         } else {
+            //判断是否有冻结的，如果冻结太多冻结就休眠，进行下次挖矿
+            if (baseHold > 0.3 * baseBalance) {
+                return;
+            }
             try {
                 sellNotLimit(site, symbol, "limit", baseAmountSell, MineService.getMarketPrice(marketPrice * (1 + increment)));
             } catch (Exception e) {
