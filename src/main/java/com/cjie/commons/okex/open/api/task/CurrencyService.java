@@ -55,7 +55,7 @@ public class CurrencyService {
                 .build();
         currencyBalanceMapper.insert(currencyBalance);
         String text = "币对" + symbol + "余额";
-        String desp = balance.toString();
+        String desp = balance.setScale(8).toString();
         WXInfoUtils.sendInfo(text, desp);
 
     }
