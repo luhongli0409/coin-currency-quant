@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjie.cryptocurrency.quant.mapper.TickerMapper">
+    <resultMap id="BaseResultMap" type="com.cjie.commons.okex.open.api.bean.spot.result.Ticker">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="product_id" jdbcType="VARCHAR" property="product_id"/>
+        <result column="last" jdbcType="VARCHAR" property="last"/>
+        <result column="best_ask" jdbcType="VARCHAR" property="best_ask"/>
+        <result column="best_bid" jdbcType="VARCHAR" property="best_bid"/>
+        <result column="open_24h" jdbcType="VARCHAR" property="open_24h"/>
+        <result column="high_24h" jdbcType="VARCHAR" property="high_24h"/>
+        <result column="low_24h" jdbcType="VARCHAR" property="low_24h"/>
+        <result column="timestamp" jdbcType="VARCHAR" property="timestamp"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, product_id, last, best_ask, best_bid, open_24h, high_24h, low_24h, timestamp
+    </sql>
+    <select id="select" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ticker
+        where product_id = #{product_id,jdbcType=VARCHAR}
+        order by id desc limit 30;
+    </select>
+
+    <insert id="insert" keyColumn="id" keyProperty="id"
+            parameterType="com.cjie.commons.okex.open.api.bean.spot.result.Ticker"
+            useGeneratedKeys="true">
+    insert into ticker (product_id, last, best_ask,
+      best_bid, open_24h, high_24h,
+      low_24h, timestamp)
+    values (#{product_id,jdbcType=VARCHAR}, #{last,jdbcType=VARCHAR}, #{best_ask,jdbcType=VARCHAR},
+      #{best_bid,jdbcType=VARCHAR}, #{open_24h,jdbcType=VARCHAR}, #{high_24h,jdbcType=VARCHAR},
+      #{low_24h,jdbcType=VARCHAR}, #{timestamp,jdbcType=VARCHAR})
+  </insert>
+
+</mapper>
