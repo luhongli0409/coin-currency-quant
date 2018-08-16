@@ -14,11 +14,11 @@ public class MineTask {
     @Autowired
     private MineService mineService;
 
-    @Scheduled(cron = "*/4 * * * * ?")
+    @Scheduled(cron = "*/3 * * * * ?")
     public void mineCurrency1() throws JobExecutionException {
         MineTask.log.info("start mining");
         try {
-            mineService.mine1("coinall", "cac", "usdt", 0.0015);
+            mineService.mine1("coinall", "cac", "usdt", 0.002);
             //mineService.mine2("coinall", "cac", "usdt", 0.002);
         } catch (Exception e) {
             e.printStackTrace();
