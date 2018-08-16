@@ -44,6 +44,11 @@ public class CurrencyService {
 
         BigDecimal balance = new BigDecimal(baseBalance + baseHold).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaBalance + quotaHold));
 
+        String text = "币对" + baseName.toUpperCase() + quotaName.toUpperCase() + "余额";
+        String desp = "$ " + balance.setScale(8).toString();
+        WXInfoUtils.sendInfo(text, desp);
+
+        CurrencyService.log.info("add user currency");
         CurrencyBalance currencyBalance = CurrencyBalance.builder()
                 .site(site)
                 .currency(quotaName)
@@ -54,10 +59,7 @@ public class CurrencyService {
                 .modifyTime(new Date())
                 .build();
         currencyBalanceMapper.insert(currencyBalance);
-        String symbol = baseName.toUpperCase() + "/" + quotaName.toUpperCase();
-        String text = "币对" + symbol + "余额";
-        String desp = balance.setScale(8).toString();
-        WXInfoUtils.sendInfo(text, desp);
+
 
     }
 
