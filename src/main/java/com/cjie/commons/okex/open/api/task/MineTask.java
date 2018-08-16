@@ -20,8 +20,8 @@ public class MineTask {
         //log.info(JSON.toJSONString(spotAccountAPIService.getAccountByCurrency("btc")));
         try {
             mineService.mine1("coinall", "cac", "usdt", 0.0015);
-            Thread.sleep(1000);
-            mineService.mine2("coinall", "okb", "usdt", 0.002);
+            //Thread.sleep(1000);
+            //mineService.mine2("coinall", "okb", "usdt", 0.002);
         } catch (Exception e) {
             e.printStackTrace();
         }
