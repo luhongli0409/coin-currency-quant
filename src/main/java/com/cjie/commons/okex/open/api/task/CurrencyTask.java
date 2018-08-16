@@ -15,7 +15,7 @@ public class CurrencyTask {
     private CurrencyService currencyService;
 
 
-    @Scheduled(cron = "*/30 * * * * ?")
+    @Scheduled(cron = "0 */1 * * * ?")
     public void currencyBalance() throws JobExecutionException {
         CurrencyTask.log.info("CurrencyTask start mining");
         try {
