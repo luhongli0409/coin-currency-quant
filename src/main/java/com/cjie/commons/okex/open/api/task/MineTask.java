@@ -17,11 +17,9 @@ public class MineTask {
     @Scheduled(cron = "*/4 * * * * ?")
     public void mineCurrency1() throws JobExecutionException {
         MineTask.log.info("start mining");
-        //log.info(JSON.toJSONString(spotAccountAPIService.getAccountByCurrency("btc")));
         try {
             mineService.mine1("coinall", "cac", "usdt", 0.0015);
-            //Thread.sleep(1000);
-            //mineService.mine2("coinall", "okb", "usdt", 0.002);
+            //mineService.mine2("coinall", "cac", "usdt", 0.002);
         } catch (Exception e) {
             e.printStackTrace();
         }
