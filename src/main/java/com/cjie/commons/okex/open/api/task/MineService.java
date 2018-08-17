@@ -50,7 +50,7 @@ public class MineService {
 
     private static double initMultiple = 3;
 
-    private static double maxNum = 50;
+    private static double maxNum = 30;
 
     private static int numPrecision = 8;
 
@@ -408,9 +408,9 @@ public class MineService {
                 .orderPrice(new BigDecimal(price))
                 .markePrice(new BigDecimal(marketPrice))
                 .amount(new BigDecimal(amount))
-                .site(buy)
+                .site(site)
                 .createTime(new Date())
-                .type(type)
+                .type(buy)
                 .build();
         currencyOrderMapper.insert(order);
     }
