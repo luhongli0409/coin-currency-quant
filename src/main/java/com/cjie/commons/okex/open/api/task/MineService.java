@@ -408,7 +408,7 @@ public class MineService {
                 .orderPrice(new BigDecimal(price))
                 .markePrice(new BigDecimal(marketPrice))
                 .amount(new BigDecimal(amount))
-                .site(site)
+                .site(buy)
                 .createTime(new Date())
                 .type(type)
                 .build();

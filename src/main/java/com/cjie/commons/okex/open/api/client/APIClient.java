@@ -79,7 +79,7 @@ public class APIClient {
 
     public <T> T executeSyncRetry(Call<T> call) {
         try {
-            Response<T> response = call.execute();
+            Response<T> response = call.clone().execute();
             if (this.config.isPrint()) {
                 printResponse(response);
             }
