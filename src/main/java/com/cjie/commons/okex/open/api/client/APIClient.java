@@ -8,11 +8,13 @@ import com.cjie.commons.okex.open.api.constant.APIConstants;
 import com.cjie.commons.okex.open.api.enums.HttpHeadersEnum;
 import com.cjie.commons.okex.open.api.exception.APIException;
 import com.cjie.commons.okex.open.api.utils.DateUtils;
+import com.cjie.cryptocurrency.quant.api.fcoin.FcoinRetry;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.retry.support.RetryTemplate;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -31,6 +33,8 @@ import java.util.Optional;
 public class APIClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIClient.class);
+
+    private static final RetryTemplate retryTemplate = FcoinRetry.getRetryTemplate();
 
     private APIConfiguration config;
     private APICredentials credentials;
@@ -63,10 +67,17 @@ public class APIClient {
         return apiHttp;
     }
 
+
     /**
      * Synchronous send request
      */
     public <T> T executeSync(Call<T> call) {
+        return APIClient.retryTemplate.execute(
+                retryContext -> executeSyncRetry(call)
+        );
+    }
+
+    public <T> T executeSyncRetry(Call<T> call) {
         try {
             Response<T> response = call.execute();
             if (this.config.isPrint()) {
@@ -136,6 +147,6 @@ public class APIClient {
         } else {
             responseInfo.append("\n\t\t").append("\n\tRequest Error: response is null");
         }
-        LOG.info(responseInfo.toString());
+        APIClient.LOG.info(responseInfo.toString());
     }
 }
