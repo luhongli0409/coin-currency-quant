@@ -4,11 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.cjie.commons.okex.open.api.bean.spot.param.PlaceOrderParam;
 import com.cjie.commons.okex.open.api.bean.spot.result.Account;
 import com.cjie.commons.okex.open.api.bean.spot.result.OrderInfo;
+import com.cjie.commons.okex.open.api.bean.spot.result.OrderResult;
 import com.cjie.commons.okex.open.api.bean.spot.result.Ticker;
 import com.cjie.commons.okex.open.api.service.spot.SpotAccountAPIService;
 import com.cjie.commons.okex.open.api.service.spot.SpotOrderAPIServive;
 import com.cjie.commons.okex.open.api.service.spot.SpotProductAPIService;
+import com.cjie.cryptocurrency.quant.mapper.CurrencyOrderMapper;
 import com.cjie.cryptocurrency.quant.model.APIKey;
+import com.cjie.cryptocurrency.quant.model.CurrencyOrder;
 import com.cjie.cryptocurrency.quant.service.ApiKeyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +47,9 @@ public class MineService {
 
     @Autowired
     private ApiKeyService  apiKeyService;
+
+    @Autowired
+    private CurrencyOrderMapper currencyOrderMapper;
 
 
     private static double initMultiple = 3;
@@ -234,15 +241,11 @@ public class MineService {
         String symbol = baseName.toUpperCase() + "-" + quotaName.toUpperCase();
         cancelOrders(site, getNotTradeOrders(site, symbol, "0", "100"));
 
-
         //查询余额
         Account baseAccount = getBalance(site, baseName);
-        double baseHold = new BigDecimal(baseAccount.getBalance()).doubleValue() - new BigDecimal(baseAccount.getAvailable()).doubleValue();
         double baseBalance = new BigDecimal(baseAccount.getBalance()).doubleValue();
 
-
         Account quotaAccount = getBalance(site, quotaName);
-        double quotaHold = new BigDecimal(quotaAccount.getBalance()).doubleValue() - new BigDecimal(quotaAccount.getAvailable()).doubleValue();
         double quotaBalance = new BigDecimal(quotaAccount.getBalance()).doubleValue();
 
 
@@ -255,8 +258,6 @@ public class MineService {
         MineService.log.info("basebalance:{}, qutobalance:{}, allAsset:{}, asset/2:{}, basebalance-quota:{}",
                 baseBalance, quotaBalance, allAsset, allAsset*baseRatio, baseBalance * marketPrice );
 
-        BigDecimal quotaChange = null;
-        BigDecimal baseChange = null;
         if (allAsset*baseRatio - baseBalance * marketPrice  > allAsset * increment) {
             BigDecimal amount = new BigDecimal(allAsset * baseRatio - baseBalance * marketPrice).setScale(MineService.numPrecision, BigDecimal.ROUND_FLOOR);
             MineService.log.info("basebalance:{}, quotabalance:{}", baseBalance + amount.doubleValue(),
@@ -268,9 +269,7 @@ public class MineService {
             } else {
                 BigDecimal baseamount = amount.divide(new BigDecimal(marketPrice),
                         MineService.numPrecision, BigDecimal.ROUND_DOWN);
-                quotaChange = baseamount.multiply(MineService.getMarketPrice(marketPrice)).negate();
-                baseChange = baseamount;
-                buy(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice));//此处不需要重试，让上次去判断余额后重新平衡
+                buy(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice));
             }
         }
 
@@ -286,10 +285,7 @@ public class MineService {
             } else {
                 BigDecimal baseamount = amount.divide(new BigDecimal(marketPrice),
                         MineService.numPrecision, BigDecimal.ROUND_DOWN);
-                quotaChange = baseamount.multiply(MineService.getMarketPrice(marketPrice));
-                baseChange = baseamount.negate();
-                sell(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice));//此处不需要重试，让上次去判断余额后重新平衡
-
+                sell(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice));
             }
 
         }
@@ -304,9 +300,12 @@ public class MineService {
             if (System.currentTimeMillis() - 8 * 3600 * 1000 - dateFormat.parse(orderInfo.getCreated_at()).getTime() < 5 * 60 * 1000) {
                 continue;
             }
-            PlaceOrderParam placeOrderParam = new PlaceOrderParam();
-            placeOrderParam.setProduct_id(orderInfo.getProduct_id());
-            spotOrderAPIService.cancleOrderByOrderId(site, placeOrderParam, orderInfo.getOrder_id());
+            CurrencyOrder currencyOrder = currencyOrderMapper.selectByOrderId(orderInfo.getOrder_id().toString());
+            if (currencyOrder != null && currencyOrder.getId() > 0) {
+                PlaceOrderParam placeOrderParam = new PlaceOrderParam();
+                placeOrderParam.setProduct_id(orderInfo.getProduct_id());
+                spotOrderAPIService.cancleOrderByOrderId(site, placeOrderParam, orderInfo.getOrder_id());
+            }
         }
         return true;
     }
@@ -402,7 +401,21 @@ public class MineService {
         placeOrderParam.setSide(buy);
         placeOrderParam.setType(type);
 
-        spotOrderAPIService.addOrder(site,placeOrderParam);
+        OrderResult result = spotOrderAPIService.addOrder(site, placeOrderParam);
+
+        String[] currencys = symbol.split("-");
+        CurrencyOrder order = CurrencyOrder.builder()
+                .baseCurrency(currencys[0])
+                .quotaCurrency(currencys[1])
+                .orderId(result.getOrder_id().toString())
+                .orderPrice(new BigDecimal(price))
+                .markePrice(new BigDecimal(marketPrice))
+                .amount(new BigDecimal(amount))
+                .site(site)
+                .createTime(new Date())
+                .type(type.equals("buy") ? 0 : 1)
+                .build();
+        currencyOrderMapper.insert(order);
     }
 
     public static BigDecimal getMarketPrice(double marketPrice) {
@@ -437,7 +450,6 @@ public class MineService {
         MineService.log.info(body);
         return JSON.parseObject(body,Ticker.class);
 
-        //return spotProductAPIService.getTickerByProductId(baseCurrency.toUpperCase() + "-" + quotaCurrency.toUpperCase());
     }
 
     public List<OrderInfo> getNotTradeOrders(String site, String symbol, String after, String limit) throws Exception {

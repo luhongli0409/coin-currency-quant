@@ -150,4 +150,14 @@
       type = #{type,jdbcType=TINYINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <select id="selectByOrderId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from currency_order
+    where order_id = #{orderId,jdbcType=VARCHAR}
+  </select>
+
+
 </mapper>

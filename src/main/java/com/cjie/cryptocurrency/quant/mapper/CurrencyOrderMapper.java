@@ -1,6 +1,7 @@
 package com.cjie.cryptocurrency.quant.mapper;
 
 import com.cjie.cryptocurrency.quant.model.CurrencyOrder;
+import org.apache.ibatis.annotations.Param;
 
 public interface CurrencyOrderMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +15,6 @@ public interface CurrencyOrderMapper {
     int updateByPrimaryKeySelective(CurrencyOrder record);
 
     int updateByPrimaryKey(CurrencyOrder record);
+
+    CurrencyOrder selectByOrderId(@Param("orderId") String orderId);
 }
