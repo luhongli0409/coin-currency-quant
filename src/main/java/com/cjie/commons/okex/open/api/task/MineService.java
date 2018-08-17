@@ -301,6 +301,7 @@ public class MineService {
                 continue;
             }
             CurrencyOrder currencyOrder = currencyOrderMapper.selectByOrderId(orderInfo.getOrder_id().toString());
+            MineService.log.info("cancel order id:{},currencyOrder :{}", orderInfo.getOrder_id(), currencyOrder);
             if (currencyOrder != null && currencyOrder.getId() > 0) {
                 PlaceOrderParam placeOrderParam = new PlaceOrderParam();
                 placeOrderParam.setProduct_id(orderInfo.getProduct_id());
