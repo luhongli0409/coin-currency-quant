@@ -240,12 +240,14 @@ public class MineService {
         //查询余额
         Account baseAccount = getBalance(site, baseName);
         double baseHold = new BigDecimal(baseAccount.getBalance()).doubleValue() - new BigDecimal(baseAccount.getAvailable()).doubleValue();
-        double baseBalance = new BigDecimal(baseAccount.getBalance()).doubleValue();
+        //double baseBalance = new BigDecimal(baseAccount.getBalance()).doubleValue();
+        double baseBalance = new BigDecimal(baseAccount.getAvailable()).doubleValue();
 
 
         Account quotaAccount = getBalance(site, quotaName);
         double quotaHold = new BigDecimal(quotaAccount.getBalance()).doubleValue() - new BigDecimal(quotaAccount.getAvailable()).doubleValue();
-        double quotaBalance = new BigDecimal(quotaAccount.getBalance()).doubleValue();
+        //double quotaBalance = new BigDecimal(quotaAccount.getBalance()).doubleValue();
+        double quotaBalance = new BigDecimal(quotaAccount.getAvailable()).doubleValue();
 
 
         Ticker ticker = getTicker(site, baseName, quotaName);
@@ -253,7 +255,7 @@ public class MineService {
         MineService.log.info("ticker last {} -{}:{}", baseName, quotaName, marketPrice);
 
 
-        double allAsset = (baseBalance - baseHold) * marketPrice + (quotaBalance - quotaHold);
+        double allAsset = baseBalance * marketPrice + quotaBalance;
         MineService.log.info("basebalance:{}, qutobalance:{}, allAsset:{}, asset/2:{}, basebalance-quota:{}",
                 baseBalance, quotaBalance, allAsset, allAsset*baseRatio, baseBalance * marketPrice );
 
