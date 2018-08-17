@@ -239,9 +239,12 @@ public class MineService {
 
         //查询余额
         Account baseAccount = getBalance(site, baseName);
+        double baseHold = new BigDecimal(baseAccount.getBalance()).doubleValue() - new BigDecimal(baseAccount.getAvailable()).doubleValue();
         double baseBalance = new BigDecimal(baseAccount.getBalance()).doubleValue();
 
+
         Account quotaAccount = getBalance(site, quotaName);
+        double quotaHold = new BigDecimal(quotaAccount.getBalance()).doubleValue() - new BigDecimal(quotaAccount.getAvailable()).doubleValue();
         double quotaBalance = new BigDecimal(quotaAccount.getBalance()).doubleValue();
 
 
@@ -250,7 +253,7 @@ public class MineService {
         MineService.log.info("ticker last {} -{}:{}", baseName, quotaName, marketPrice);
 
 
-        double allAsset= baseBalance * marketPrice + quotaBalance;
+        double allAsset = (baseBalance - baseHold) * marketPrice + (quotaBalance - quotaHold);
         MineService.log.info("basebalance:{}, qutobalance:{}, allAsset:{}, asset/2:{}, basebalance-quota:{}",
                 baseBalance, quotaBalance, allAsset, allAsset*baseRatio, baseBalance * marketPrice );
 
@@ -265,7 +268,7 @@ public class MineService {
             } else {
                 BigDecimal baseamount = amount.divide(new BigDecimal(marketPrice),
                         MineService.numPrecision, BigDecimal.ROUND_DOWN);
-                buy(site, symbol, "limit", baseamount.multiply(new BigDecimal("0.99")), MineService.getMarketPrice(marketPrice * (1 - increment)));
+                buy(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice * (1 - increment)));
             }
         }
 
@@ -281,7 +284,7 @@ public class MineService {
             } else {
                 BigDecimal baseamount = amount.divide(new BigDecimal(marketPrice),
                         MineService.numPrecision, BigDecimal.ROUND_DOWN);
-                sell(site, symbol, "limit", baseamount.multiply(new BigDecimal("0.99")), MineService.getMarketPrice(marketPrice * (1 + increment)));
+                sell(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice * (1 + increment)));
             }
 
         }
