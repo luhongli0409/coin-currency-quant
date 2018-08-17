@@ -5,9 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 @Slf4j
 public class MineTask {
 
@@ -23,8 +22,6 @@ public class MineTask {
             e.printStackTrace();
         }
         MineTask.log.info("end mining");
-
-
     }
 
 }
