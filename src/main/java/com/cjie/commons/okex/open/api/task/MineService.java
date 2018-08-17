@@ -281,7 +281,7 @@ public class MineService {
             } else {
                 BigDecimal baseamount = amount.divide(new BigDecimal(marketPrice),
                         MineService.numPrecision, BigDecimal.ROUND_DOWN);
-                sell(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice * (1 + increment)));
+                sell(site, symbol, "limit", baseamount.multiply(new BigDecimal("0.99")), MineService.getMarketPrice(marketPrice * (1 + increment)));
             }
 
         }
