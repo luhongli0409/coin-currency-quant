@@ -49,18 +49,18 @@ public class CurrencyService {
         StringBuffer desp = new StringBuffer();
         desp.append("币对")
                 .append(baseName.toUpperCase()).append(quotaName.toUpperCase())
-                .append("   总:").append(quotaName).append(balance.setScale(8, RoundingMode.HALF_UP).toString())
+                .append("   总").append(quotaName.toUpperCase()).append(":").append(balance.setScale(8, RoundingMode.HALF_UP).toString())
                 .append("   现价：").append(marketPrice)
-                .append("       ")
+                .append("       -----")
                 .append(baseName.toUpperCase())
-                .append("   共有:").append(baseBalance)
-                .append("   可用:").append(baseAccount.getAvailable())
-                .append("   冻结:").append(baseHold)
-                .append("       ")
+                .append("   共有:").append(new BigDecimal(baseBalance).setScale(8, RoundingMode.HALF_UP).toString())
+                .append("   可用:").append(new BigDecimal(baseAccount.getAvailable()).setScale(8, RoundingMode.HALF_UP).toString())
+                .append("   冻结:").append(new BigDecimal(baseHold).setScale(8, RoundingMode.HALF_UP).toString())
+                .append("       -----")
                 .append(quotaName.toUpperCase())
-                .append("   共有:").append(quotaBalance)
-                .append("   可用:").append(quotaAccount.getAvailable())
-                .append("   冻结:").append(quotaHold);
+                .append("   共有:").append(new BigDecimal(quotaBalance).setScale(8, RoundingMode.HALF_UP).toString())
+                .append("   可用:").append(new BigDecimal(quotaAccount.getAvailable()).setScale(8, RoundingMode.HALF_UP).toString())
+                .append("   冻结:").append(new BigDecimal(quotaHold).setScale(8, RoundingMode.HALF_UP).toString());
         WXInfoUtils.sendInfo(text, desp.toString());
 
         CurrencyService.log.info("add user currency");
