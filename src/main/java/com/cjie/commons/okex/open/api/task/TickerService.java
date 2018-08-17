@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 
 @Component
@@ -44,6 +45,13 @@ public class TickerService {
         String body = response.getBody();
         TickerService.log.info(body);
         Ticker ticker = JSON.parseObject(body, Ticker.class);
-        tickerMapper.insert(ticker);
+        Ticker oldTicker = tickerMapper.selectByProductId(ticker.getProduct_id());
+        if (oldTicker != null
+                && !(new BigDecimal(oldTicker.getLast()).setScale(5, BigDecimal.ROUND_UP)
+                .compareTo(new BigDecimal(ticker.getLast()).setScale(5, BigDecimal.ROUND_UP)) == 0)) {
+            tickerMapper.insert(ticker);
+        } else if (oldTicker == null) {
+            tickerMapper.insert(ticker);
+        }
     }
 }

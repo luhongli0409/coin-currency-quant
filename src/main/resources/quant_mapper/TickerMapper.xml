@@ -34,4 +34,13 @@
       #{low_24h,jdbcType=VARCHAR}, #{timestamp,jdbcType=VARCHAR})
   </insert>
 
+
+    <select id="selectByProductId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ticker
+        where product_id = #{product_id,jdbcType=VARCHAR}
+        order by id desc limit 1;
+    </select>
+
 </mapper>
