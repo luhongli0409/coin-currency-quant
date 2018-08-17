@@ -10,6 +10,8 @@ import lombok.*;
 @ToString
 public class Ticker {
 
+    private Long id;
+
     private String buy;
 
     private String high_24h;
