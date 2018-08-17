@@ -46,8 +46,22 @@ public class CurrencyService {
         BigDecimal balance = new BigDecimal(baseBalance).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaBalance));
 
         String text = site;
-        String desp = "币对" + baseName.toUpperCase() + quotaName.toUpperCase() + "余额$ " + balance.setScale(8, RoundingMode.HALF_UP).toString();
-        WXInfoUtils.sendInfo(text, desp);
+        StringBuffer desp = new StringBuffer();
+        desp.append("币对")
+                .append(baseName.toUpperCase()).append(quotaName.toUpperCase())
+                .append("   总:").append(quotaName).append(balance.setScale(8, RoundingMode.HALF_UP).toString())
+                .append("   现价：").append(marketPrice)
+                .append("       ")
+                .append(baseName.toUpperCase())
+                .append("   共有:").append(baseBalance)
+                .append("   可用:").append(baseAccount.getAvailable())
+                .append("   冻结:").append(baseHold)
+                .append("       ")
+                .append(quotaName.toUpperCase())
+                .append("   共有:").append(quotaBalance)
+                .append("   可用:").append(quotaAccount.getAvailable())
+                .append("   冻结:").append(quotaHold);
+        WXInfoUtils.sendInfo(text, desp.toString());
 
         CurrencyService.log.info("add user currency");
         CurrencyBalance currencyBalance = CurrencyBalance.builder()
