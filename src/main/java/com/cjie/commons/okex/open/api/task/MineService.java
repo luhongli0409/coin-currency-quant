@@ -8,7 +8,6 @@ import com.cjie.commons.okex.open.api.bean.spot.result.OrderResult;
 import com.cjie.commons.okex.open.api.bean.spot.result.Ticker;
 import com.cjie.commons.okex.open.api.service.spot.SpotAccountAPIService;
 import com.cjie.commons.okex.open.api.service.spot.SpotOrderAPIServive;
-import com.cjie.commons.okex.open.api.service.spot.SpotProductAPIService;
 import com.cjie.cryptocurrency.quant.mapper.CurrencyOrderMapper;
 import com.cjie.cryptocurrency.quant.model.APIKey;
 import com.cjie.cryptocurrency.quant.model.CurrencyOrder;
@@ -35,9 +34,6 @@ import java.util.Map;
 @Component
 @Slf4j
 public class MineService {
-
-    @Autowired
-    private SpotProductAPIService spotProductAPIService;
 
     @Autowired
     private SpotAccountAPIService spotAccountAPIService;
@@ -269,7 +265,7 @@ public class MineService {
             } else {
                 BigDecimal baseamount = amount.divide(new BigDecimal(marketPrice),
                         MineService.numPrecision, BigDecimal.ROUND_DOWN);
-                buy(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice));
+                buy(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice * (1 - increment)));
             }
         }
 
@@ -285,7 +281,7 @@ public class MineService {
             } else {
                 BigDecimal baseamount = amount.divide(new BigDecimal(marketPrice),
                         MineService.numPrecision, BigDecimal.ROUND_DOWN);
-                sell(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice));
+                sell(site, symbol, "limit", baseamount, MineService.getMarketPrice(marketPrice * (1 + increment)));
             }
 
         }
@@ -414,7 +410,7 @@ public class MineService {
                 .amount(new BigDecimal(amount))
                 .site(site)
                 .createTime(new Date())
-                .type(type.equals("buy") ? 0 : 1)
+                .type(type)
                 .build();
         currencyOrderMapper.insert(order);
     }
@@ -463,10 +459,6 @@ public class MineService {
     public List<OrderInfo> getOrders(String site, String symbol, String states, String after, String limit, String side) throws Exception {
         return spotOrderAPIService.getOrders(site, symbol, states, null, null, null);
 
-    }
-
-    public static void main(String[] args) {
-        new MineService().getTicker("oktop","top", "usdt");
     }
 
 }

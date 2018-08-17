@@ -29,6 +29,6 @@ public class CurrencyOrder {
 
     private Date createTime;
 
-    private Integer type;
+    private String type;
 
 }

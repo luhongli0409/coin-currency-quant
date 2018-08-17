@@ -212,7 +212,7 @@ public class FcoinUtils {
                     .orderPrice(new BigDecimal(price))
                     .createTime(new Date())
                     .markePrice(new BigDecimal(marketPrice))
-                    .type("buy".equals(side) ? 1 : 2)
+                    .type(side)
                     .site("fcoin")
                     .baseCurrency("ft")
                     .quotaCurrency("usdt").build();

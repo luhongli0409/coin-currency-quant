@@ -11,7 +11,7 @@
     <result column="amount" jdbcType="DECIMAL" property="amount" />
     <result column="site" jdbcType="VARCHAR" property="site" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="type" jdbcType="VARCHAR" property="type"/>
   </resultMap>
   <sql id="Base_Column_List">
     id, order_id, base_currency, quota_currency, order_price, marke_price, amount, site, 
@@ -35,7 +35,7 @@
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=VARCHAR}, #{baseCurrency,jdbcType=VARCHAR}, 
       #{quotaCurrency,jdbcType=VARCHAR}, #{orderPrice,jdbcType=DECIMAL}, #{markePrice,jdbcType=DECIMAL}, 
       #{amount,jdbcType=DECIMAL}, #{site,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{type,jdbcType=TINYINT})
+      #{type,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.cjie.cryptocurrency.quant.model.CurrencyOrder">
     insert into currency_order
@@ -100,7 +100,7 @@
         #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="type != null">
-        #{type,jdbcType=TINYINT},
+        #{type,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -132,7 +132,7 @@
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="type != null">
-        type = #{type,jdbcType=TINYINT},
+        type = #{type,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -147,7 +147,7 @@
       amount = #{amount,jdbcType=DECIMAL},
       site = #{site,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      type = #{type,jdbcType=TINYINT}
+      type = #{type,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
