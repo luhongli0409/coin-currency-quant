@@ -43,4 +43,23 @@
         order by id desc limit 1;
     </select>
 
+
+    <select id="selectMaxByProductId" resultMap="java.math.BigDecimal">
+        select
+        MAX(last)
+        from ticker
+        where product_id = #{product_id}
+        ORDER BY id desc
+        limit #{limitNum}
+    </select>
+
+    <select id="selectMinByProductId" resultMap="java.math.BigDecimal">
+        select
+        MIN(last)
+        from ticker
+        where product_id = #{product_id}
+        ORDER BY id desc
+        limit #{limitNum}
+    </select>
+
 </mapper>
