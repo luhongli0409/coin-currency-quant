@@ -3,7 +3,6 @@ package com.cjie.cryptocurrency.quant.mapper;
 import com.cjie.commons.okex.open.api.bean.spot.result.Ticker;
 import org.apache.ibatis.annotations.Param;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface TickerMapper {
@@ -24,8 +23,8 @@ public interface TickerMapper {
 
     Ticker selectByProductId(@Param("product_id") String productId);
 
-    BigDecimal selectMaxByProductId(@Param("product_id") String productId, @Param("limitNum") Integer limitNum);
+    String selectMaxByProductId(@Param("product_id") String productId, @Param("limitNum") Integer limitNum);
 
-    BigDecimal selectMinByProductId(@Param("product_id") String productId,@Param("limitNum") Integer limitNum);
+    String selectMinByProductId(@Param("product_id") String productId,@Param("limitNum") Integer limitNum);
 
 }
