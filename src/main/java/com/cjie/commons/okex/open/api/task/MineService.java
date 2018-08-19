@@ -298,7 +298,7 @@ public class MineService {
         }
         for (OrderInfo orderInfo : orderIds) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            if (System.currentTimeMillis() - 8 * 3600 * 1000 - dateFormat.parse(orderInfo.getCreated_at()).getTime() < 5 * 60 * 1000) {
+            if (System.currentTimeMillis() - 8 * 3600 * 1000 - dateFormat.parse(orderInfo.getCreated_at()).getTime() < 15 * 60 * 1000) {
                 continue;
             }
             CurrencyOrder currencyOrder = currencyOrderMapper.selectByOrderId(orderInfo.getOrder_id().toString());

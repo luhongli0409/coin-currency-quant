@@ -26,7 +26,7 @@ public class CoinService {
 
     private static final int pricePrecision = 8;
 
-    private static final int query_num = 30;
+    private static final int query_num = 40;
 
     private static Map<String, Double> minLimitPriceOrderNums = new HashMap<>();
 
