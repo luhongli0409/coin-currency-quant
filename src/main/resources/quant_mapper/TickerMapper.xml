@@ -45,21 +45,11 @@
 
 
     <select id="selectMaxByProductId" resultType="java.lang.String">
-        select
-        MAX(last)
-        from ticker
-        where product_id = #{product_id}
-        ORDER BY id desc
-        limit #{limitNum}
+        select MAX( last )  from (select * FROM ticker WHERE product_id = #{product_id}  ORDER BY id DESC  LIMIT #{limitNum} ) a
     </select>
 
     <select id="selectMinByProductId" resultType="java.lang.String">
-        select
-        MIN(last)
-        from ticker
-        where product_id = #{product_id}
-        ORDER BY id desc
-        limit #{limitNum}
+        select MIN( last )  from (select * FROM ticker WHERE product_id = #{product_id}  ORDER BY id DESC  LIMIT #{limitNum} ) a
     </select>
 
 </mapper>

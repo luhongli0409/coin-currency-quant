@@ -26,6 +26,8 @@ public class CoinService {
 
     private static final int pricePrecision = 8;
 
+    private static final int query_num = 30;
+
     private static Map<String, Double> minLimitPriceOrderNums = new HashMap<>();
 
     static {
@@ -75,7 +77,7 @@ public class CoinService {
             } else {
                 //计算下单价格
                 BigDecimal marketPriceValue = getMarketPrice(marketPrice * (1 - increment));
-                BigDecimal marketMinPrice = new BigDecimal(tickerMapper.selectMinByProductId(symbol,30)).setScale(CoinService.numPrecision, BigDecimal.ROUND_FLOOR);
+                BigDecimal marketMinPrice = new BigDecimal(tickerMapper.selectMinByProductId(symbol,query_num)).setScale(CoinService.numPrecision, BigDecimal.ROUND_FLOOR);
                 BigDecimal marketValue = marketPriceValue.min(marketMinPrice);
                 BigDecimal baseamount = amount.divide(marketValue,CoinService.numPrecision, BigDecimal.ROUND_DOWN);
                 log.info("order buy amount = {} and price = {}",baseamount,marketValue);
@@ -94,7 +96,7 @@ public class CoinService {
             } else {
                 //计算下单价格
                 BigDecimal marketPriceValue = getMarketPrice(marketPrice * (1 + increment));
-                BigDecimal marketMaxPrice = new BigDecimal(tickerMapper.selectMaxByProductId(symbol,30)).setScale(CoinService.numPrecision, BigDecimal.ROUND_FLOOR);
+                BigDecimal marketMaxPrice = new BigDecimal(tickerMapper.selectMaxByProductId(symbol,query_num)).setScale(CoinService.numPrecision, BigDecimal.ROUND_FLOOR);
                 BigDecimal marketValue = marketPriceValue.max(marketMaxPrice);
                 BigDecimal baseamount = amount.divide(marketValue,CoinService.numPrecision, BigDecimal.ROUND_DOWN);
                 log.info("order sell amount = {} and price = {}",baseamount,marketValue);
