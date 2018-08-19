@@ -44,7 +44,7 @@
     </select>
 
 
-    <select id="selectMaxByProductId" resultMap="java.lang.String">
+    <select id="selectMaxByProductId" resultType="java.lang.String">
         select
         MAX(last)
         from ticker
@@ -53,7 +53,7 @@
         limit #{limitNum}
     </select>
 
-    <select id="selectMinByProductId" resultMap="java.lang.String">
+    <select id="selectMinByProductId" resultType="java.lang.String">
         select
         MIN(last)
         from ticker
