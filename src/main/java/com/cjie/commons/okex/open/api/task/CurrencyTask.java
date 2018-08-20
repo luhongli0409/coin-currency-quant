@@ -20,7 +20,7 @@ public class CurrencyTask {
         CurrencyTask.log.info("CurrencyTask start mining");
         try {
             currencyService.currency("coinall", "cac", "usdt");
-            currencyService.currency("okex", "okb", "usdt");
+            //currencyService.currency("okex", "okb", "usdt");
         } catch (Exception e) {
             e.printStackTrace();
         }

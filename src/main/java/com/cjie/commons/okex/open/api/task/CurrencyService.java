@@ -19,7 +19,7 @@ import java.util.Date;
 public class CurrencyService {
 
     @Autowired
-    private MineService mineService;
+    private ApiService apiService;
 
     @Autowired
     private CurrencyBalanceMapper currencyBalanceMapper;
@@ -40,7 +40,7 @@ public class CurrencyService {
         double quotaHold = new BigDecimal(quotaAccount.getBalance()).doubleValue() - new BigDecimal(quotaAccount.getAvailable()).doubleValue();
         double quotaBalance = new BigDecimal(quotaAccount.getBalance()).doubleValue();
 
-        Ticker ticker = mineService.getTicker(site, baseName, quotaName);
+        Ticker ticker = apiService.getTicker(site, baseName, quotaName);
         Double marketPrice = Double.parseDouble(ticker.getLast());
 
         BigDecimal hold = new BigDecimal(baseHold).multiply(new BigDecimal(marketPrice).add(new BigDecimal(quotaHold)));

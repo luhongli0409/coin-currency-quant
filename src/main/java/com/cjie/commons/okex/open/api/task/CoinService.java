@@ -16,7 +16,7 @@ import java.util.Map;
 public class CoinService {
 
     @Autowired
-    private MineService mineService;
+    private ApiService apiService;
 
     @Autowired
     private TickerMapper tickerMapper;
@@ -50,15 +50,15 @@ public class CoinService {
     public void coin(String site, String baseName, String quotaName, double increment, double baseRatio) throws Exception {
 
         String symbol = baseName.toUpperCase() + "-" + quotaName.toUpperCase();
-        mineService.cancelOrders(site, mineService.getNotTradeOrders(site, symbol, "0", "100"));
+        apiService.cancelOrders(site, apiService.getNotTradeOrders(site, symbol, "0", "100"));
         //查询余额
-        Account baseAccount = mineService.getBalance(site, baseName);
+        Account baseAccount = apiService.getBalance(site, baseName);
         double baseAvailable = new BigDecimal(baseAccount.getAvailable()).doubleValue();
 
-        Account quotaAccount = mineService.getBalance(site, quotaName);
+        Account quotaAccount = apiService.getBalance(site, quotaName);
         double quotaAvailable = new BigDecimal(quotaAccount.getAvailable()).doubleValue();
 
-        Ticker ticker = mineService.getTicker(site, baseName, quotaName);
+        Ticker ticker = apiService.getTicker(site, baseName, quotaName);
         Double marketPrice = Double.parseDouble(ticker.getLast());
         CoinService.log.info("ticker last {} -{}:{}", baseName, quotaName, marketPrice);
 
@@ -81,7 +81,7 @@ public class CoinService {
                 BigDecimal marketValue = marketPriceValue.min(marketMinPrice);
                 BigDecimal baseamount = amount.divide(marketValue,CoinService.numPrecision, BigDecimal.ROUND_DOWN);
                 log.info("order buy amount = {} and price = {}",baseamount,marketValue);
-                mineService.buy(site, symbol, "limit", baseamount, marketValue);
+                apiService.buy(site, symbol, "limit", baseamount, marketValue);
             }
         }
 
@@ -100,13 +100,13 @@ public class CoinService {
                 BigDecimal marketValue = marketPriceValue.max(marketMaxPrice);
                 BigDecimal baseamount = amount.divide(marketValue,CoinService.numPrecision, BigDecimal.ROUND_DOWN);
                 log.info("order sell amount = {} and price = {}",baseamount,marketValue);
-                mineService.sell(site, symbol, "limit", baseamount, marketValue);
+                apiService.sell(site, symbol, "limit", baseamount, marketValue);
             }
         }
     }
 
     public static BigDecimal getMarketPrice(double marketPrice) {
-        return MineService.getBigDecimal(marketPrice, pricePrecision);
+        return ApiService.getBigDecimal(marketPrice, pricePrecision);
     }
 
 }
