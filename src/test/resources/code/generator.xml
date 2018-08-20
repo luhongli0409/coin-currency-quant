@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <properties resource="code/mybatis.properties"/>
+
+    <context id="default" targetRuntime="MyBatis3"
+             defaultModelType="conditional"> <!-- MyBatis3Simple -->
+
+
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <property name="suppressTypeWarnings" value="true"/>
+        <property name="dao.component" value="${generate.dao.component}"/>
+        <property name="dao.environment" value="${generate.dao.environment}"/>
+        <property name="generate.src.package" value="${generate.src.package}"/>
+        <property name="generate.dao.type" value="${generate.dao.type}"/>
+        <property name="generate.dao.base" value="${generate.dao.base}"/>
+
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.CaseInsensitiveLikePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.CachePlugin"/>
+
+        <plugin type="com.okcoin.LombokPlugin">
+            <property name="hasLombok" value="true"/>
+        </plugin>
+
+        <!-- 注释 -->
+        <commentGenerator type="com.okcoin.MyCommentGenerator"></commentGenerator>
+
+
+        <jdbcConnection driverClass="${driver}" connectionURL="${url4mysql}" userId="${username}"
+                        password="${password}"></jdbcConnection>
+
+        <!-- 类型转换 -->
+        <javaTypeResolver type="com.okcoin.JavaTypeResolverImpl">
+            <!-- 是否使用bigDecimal， false可自动转化以下类型（Long, Integer, Short, etc.） -->
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+
+        <javaModelGenerator targetPackage="${generate.domain.package}"
+                            targetProject="${generate.domain.dir}">    <!-- 实体类 -->
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="."
+                         targetProject="${generate.wallet.dir}">    <!-- Mapper.xml -->
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER" targetPackage="${generate.dao.package}"
+                             targetProject="${generate.dao.dir}">    <!-- dao.java -->
+            <property name="enableSubPackages" value="true"/>
+            <property name="methodNameCalculator" value="extended"/>
+        </javaClientGenerator>
+
+        <!-- 修改以下 table 生成相应的mapper  -->
+        <table enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false" schema="general" selectByExampleQueryId="false" tableName="lock_position_record">
+            <generatedKey column="id" identity="true" sqlStatement="JDBC" />
+        </table>
+    </context>
+</generatorConfiguration>
