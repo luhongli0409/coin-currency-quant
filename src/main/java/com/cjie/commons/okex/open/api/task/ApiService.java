@@ -14,6 +14,7 @@ import com.cjie.cryptocurrency.quant.model.CurrencyOrder;
 import com.cjie.cryptocurrency.quant.service.ApiKeyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -46,6 +47,11 @@ public class ApiService {
 
     @Autowired
     private CurrencyOrderMapper currencyOrderMapper;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    private static String AVERAGE = "-AVERAGE";
 
 
     private static double initMultiple = 3;
@@ -418,6 +424,16 @@ public class ApiService {
                 .type(buy)
                 .build();
         currencyOrderMapper.insert(order);
+
+        //记录下单平均价格
+        String key = symbol.toUpperCase()+"-"+buy.toUpperCase()+AVERAGE;
+        log.info("create order value average key:{}",key);
+        String value = stringRedisTemplate.opsForValue().get("key");
+        if(null == value || value.trim() == ""){
+            stringRedisTemplate.opsForValue().set(key,price);
+        }else{
+            stringRedisTemplate.opsForValue().set(key,new BigDecimal(value).add(new BigDecimal(price)).divide(new BigDecimal("2")).toString());
+        }
     }
 
     public static BigDecimal getMarketPrice(double marketPrice) {
