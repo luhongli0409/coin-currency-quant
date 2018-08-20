@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
+import java.net.URLEncoder;
+
 /**
  * Order Id Utils
  *
@@ -30,7 +32,7 @@ public class WXInfoUtils {
         WXInfoUtils.log.info("send weixin info start info text:{},desp:{}", text, desp);
         try {
             final Request request = new Request.Builder()
-                    .url(WXInfoUtils.SEND_URL + "?text=" + text + "&desp=" + desp)
+                    .url(WXInfoUtils.SEND_URL + "?text=" + text + "&desp=" + URLEncoder.encode(desp))
                     .get()
                     .build();
             okhttp3.Response response = null;
