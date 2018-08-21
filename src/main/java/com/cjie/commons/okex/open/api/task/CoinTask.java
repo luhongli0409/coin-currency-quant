@@ -1,6 +1,7 @@
 package com.cjie.commons.okex.open.api.task;
 
 
+import com.cjie.commons.okex.open.api.enums.TaskEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +15,22 @@ public class CoinTask {
     @Autowired
     private CoinService coinService;
 
+    @Autowired
+    private ApiService apiService;
+
     @Scheduled(cron = "*/3 * * * * ?")
     public void mineCurrency1() throws JobExecutionException {
-        CoinTask.log.info("start mining");
+        CoinTask.log.info("CoinTask start mining");
         try {
-            coinService.coin("coinall", "cac", "usdt", 0.005, 0.5);
+            boolean flag = apiService.canExecute(TaskEnum.COIN_TRADE_TASK.getTaskId());
+            CoinTask.log.info("CoinTask can execute flag :{}",flag);
+            if(flag){
+                coinService.coin("coinall", "cac", "usdt", 0.005, 0.5);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        CoinTask.log.info("end mining");
+        CoinTask.log.info("CoinTask end mining");
     }
 
 }

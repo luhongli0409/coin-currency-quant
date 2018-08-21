@@ -2,13 +2,11 @@ package com.cjie.commons.okex.open.api.task;
 
 import com.alibaba.fastjson.JSON;
 import com.cjie.commons.okex.open.api.bean.spot.param.PlaceOrderParam;
-import com.cjie.commons.okex.open.api.bean.spot.result.Account;
-import com.cjie.commons.okex.open.api.bean.spot.result.OrderInfo;
-import com.cjie.commons.okex.open.api.bean.spot.result.OrderResult;
-import com.cjie.commons.okex.open.api.bean.spot.result.Ticker;
+import com.cjie.commons.okex.open.api.bean.spot.result.*;
 import com.cjie.commons.okex.open.api.service.spot.SpotAccountAPIService;
 import com.cjie.commons.okex.open.api.service.spot.SpotOrderAPIServive;
 import com.cjie.cryptocurrency.quant.mapper.CurrencyOrderMapper;
+import com.cjie.cryptocurrency.quant.mapper.TaskConfigMapper;
 import com.cjie.cryptocurrency.quant.model.APIKey;
 import com.cjie.cryptocurrency.quant.model.CurrencyOrder;
 import com.cjie.cryptocurrency.quant.service.ApiKeyService;
@@ -27,10 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -50,6 +45,9 @@ public class ApiService {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private TaskConfigMapper taskConfigMapper;
 
     private static String AVERAGE = "-AVERAGE";
 
@@ -480,6 +478,39 @@ public class ApiService {
     public List<OrderInfo> getOrders(String site, String symbol, String states, String after, String limit, String side) throws Exception {
         return spotOrderAPIService.getOrders(site, symbol, states, null, null, null);
 
+    }
+
+    /**
+     * 判断定时任务是否允许执行
+     * @param taskId
+     * @return
+     */
+    public boolean  canExecute(long taskId){
+        List<TaskConfig> taskConfigList = taskConfigMapper.select();
+        TaskConfig config =
+                taskConfigList.stream().filter(
+                        taskConfig -> taskConfig.getId().longValue() == taskId)
+                        .findFirst()
+                        .orElse(null);
+        if(null != config){
+            if(config.getStatus() != 0){
+                return false;
+            }
+            Calendar calendar = Calendar.getInstance();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            if(config.getTimeStatus() == 0){
+                if(hour >= config.getStartHour() && hour <= config.getEndHour()){
+                    return true;
+                }
+                return false;
+            }else if(config.getTimeStatus() == 1){
+                if(hour < config.getStartHour() && hour > config.getEndHour()){
+                    return true;
+                }
+                return false;
+            }
+        }
+        return true;
     }
 
 }

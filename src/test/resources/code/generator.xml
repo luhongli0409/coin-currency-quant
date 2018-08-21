@@ -59,7 +59,7 @@
         </javaClientGenerator>
 
         <!-- 修改以下 table 生成相应的mapper  -->
-        <table enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false" schema="general" selectByExampleQueryId="false" tableName="lock_position_record">
+        <table enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false" schema="general" selectByExampleQueryId="false" tableName="task_config">
             <generatedKey column="id" identity="true" sqlStatement="JDBC" />
         </table>
     </context>

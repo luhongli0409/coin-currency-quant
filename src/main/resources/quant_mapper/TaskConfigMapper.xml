@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjie.cryptocurrency.quant.mapper.TaskConfigMapper" >
+  <resultMap id="BaseResultMap" type="com.cjie.commons.okex.open.api.bean.spot.result.TaskConfig" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="task_name" property="taskName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="time_status" property="timeStatus" jdbcType="TINYINT" />
+    <result column="start_hour" property="startHour" jdbcType="TINYINT" />
+    <result column="end_hour" property="endHour" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, task_name, status, time_status, start_hour, end_hour
+  </sql>
+  <select id="select" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from task_config
+  </select>
+</mapper>
