@@ -20,7 +20,7 @@ public class TickerTask {
         try {
             tickerService.getTicker("coinall", "cac", "usdt");
             Thread.sleep(1000);
-            tickerService.getTicker("coinall", "okb", "btc");
+            tickerService.getTicker("coinall", "okb", "usdt");
         } catch (Exception e) {
             e.printStackTrace();
         }
