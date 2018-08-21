@@ -14,7 +14,7 @@ public class TickerTask {
     @Autowired
     private TickerService tickerService;
 
-    @Scheduled(cron = "*/6 * * * * ?")
+    @Scheduled(cron = "*/4 * * * * ?")
     public void mineCurrency1() throws JobExecutionException {
         TickerTask.log.info("start mining");
         try {
