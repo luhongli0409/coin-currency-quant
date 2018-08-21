@@ -51,8 +51,8 @@ public class CurrencyService {
         StringBuffer desp = new StringBuffer();
         desp.append("币对")
                 .append(baseName.toUpperCase()).append(quotaName.toUpperCase()).append(style_flag)
-                .append("持有").append(quotaName.toUpperCase()).append(":").append(balance.setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
-                .append("现价").append(quotaName.toUpperCase()).append(":").append(marketPrice).append(style_flag)
+                .append("持有:").append(balance.setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
+                .append("现价:").append(marketPrice).append(style_flag)
                 .append(baseName.toUpperCase()).append(style_flag)
                 .append("持有:").append(new BigDecimal(baseBalance).setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
                 .append("可用:").append(new BigDecimal(baseAccount.getAvailable()).setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
