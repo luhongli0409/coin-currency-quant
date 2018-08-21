@@ -25,9 +25,7 @@ public class CoinTask {
             boolean flag = apiService.canExecute(TaskEnum.COIN_TRADE_TASK.getTaskId());
             CoinTask.log.info("CoinTask can execute flag :{}",flag);
             if(flag){
-                //coinService.coin("coinall", "cac", "usdt", 0.005, 0.5);
-                //Thread.sleep(500);
-                coinService.coin("coinall", "okb", "usdt", 0.008, 0.5);
+                coinService.coin("coinall", "cac", "usdt", 0.005, 0.5);
             }
         } catch (Exception e) {
             e.printStackTrace();

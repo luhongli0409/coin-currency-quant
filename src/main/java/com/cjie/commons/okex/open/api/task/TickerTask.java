@@ -19,8 +19,6 @@ public class TickerTask {
         TickerTask.log.info("start mining");
         try {
             tickerService.getTicker("coinall", "cac", "usdt");
-            Thread.sleep(1000);
-            tickerService.getTicker("coinall", "okb", "usdt");
         } catch (Exception e) {
             e.printStackTrace();
         }
