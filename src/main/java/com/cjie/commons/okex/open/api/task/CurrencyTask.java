@@ -23,7 +23,7 @@ public class CurrencyTask {
     public void currencyBalance() throws JobExecutionException {
         CurrencyTask.log.info("CurrencyTask start mining");
         try {
-            boolean flag = apiService.canExecute(TaskEnum.COIN_TRADE_TASK.getTaskId());
+            boolean flag = apiService.canExecute(TaskEnum.BALANCE_SEND_WX_TASK.getTaskId());
             CurrencyTask.log.info("CurrencyTask can execute flag :{}",flag);
             if(flag){
                 currencyService.currency("coinall", "cac", "usdt");
