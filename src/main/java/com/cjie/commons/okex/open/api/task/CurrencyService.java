@@ -43,27 +43,27 @@ public class CurrencyService {
         Ticker ticker = apiService.getTicker(site, baseName, quotaName);
         Double marketPrice = Double.parseDouble(ticker.getLast());
 
-        BigDecimal hold = new BigDecimal(baseHold).multiply(new BigDecimal(marketPrice).add(new BigDecimal(quotaHold)));
-
         BigDecimal balance = new BigDecimal(baseBalance).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaBalance));
 
         String text = site;
         StringBuffer desp = new StringBuffer();
         desp.append("币对")
-                .append(baseName.toUpperCase()).append(quotaName.toUpperCase()).append(style_flag)
-                .append("持有:").append(balance.setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
-                .append("现价:").append(marketPrice).append(style_flag)
-                .append(baseName.toUpperCase()).append(style_flag)
-                .append("持有:").append(new BigDecimal(baseBalance).setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
-                .append("可用:").append(new BigDecimal(baseAccount.getAvailable()).setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
-                .append("冻结:").append(new BigDecimal(baseHold).setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
-                .append(quotaName.toUpperCase()).append(style_flag)
-                .append("持有:").append(new BigDecimal(quotaBalance).setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
-                .append("可用:").append(new BigDecimal(quotaAccount.getAvailable()).setScale(8, RoundingMode.HALF_UP).toString()).append(style_flag)
+                .append(baseName.toUpperCase()).append(quotaName.toUpperCase()).append(CurrencyService.style_flag)
+                .append("持有:").append(balance.setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
+                .append("现价:").append(marketPrice).append(CurrencyService.style_flag)
+                .append(baseName.toUpperCase()).append(CurrencyService.style_flag)
+                .append("持有:").append(new BigDecimal(baseBalance).setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
+                .append("可用:").append(new BigDecimal(baseAccount.getAvailable()).setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
+                .append("冻结:").append(new BigDecimal(baseHold).setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
+                .append(quotaName.toUpperCase()).append(CurrencyService.style_flag)
+                .append("持有:").append(new BigDecimal(quotaBalance).setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
+                .append("可用:").append(new BigDecimal(quotaAccount.getAvailable()).setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
                 .append("冻结:").append(new BigDecimal(quotaHold).setScale(8, RoundingMode.HALF_UP).toString());
         WXInfoUtils.sendInfo(text, desp.toString());
 
         CurrencyService.log.info("add user currency");
+        BigDecimal hold = new BigDecimal(quotaAccount.getAvailable()).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaHold));
+
         CurrencyBalance currencyBalance = CurrencyBalance.builder()
                 .site(site)
                 .currency(quotaName)
