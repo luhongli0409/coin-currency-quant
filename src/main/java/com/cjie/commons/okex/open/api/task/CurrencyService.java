@@ -2,6 +2,7 @@ package com.cjie.commons.okex.open.api.task;
 
 import com.cjie.commons.okex.open.api.bean.spot.result.Account;
 import com.cjie.commons.okex.open.api.bean.spot.result.Ticker;
+import com.cjie.commons.okex.open.api.bean.spot.result.ValuationTicker;
 import com.cjie.commons.okex.open.api.service.spot.SpotAccountAPIService;
 import com.cjie.commons.okex.open.api.utils.WXInfoUtils;
 import com.cjie.cryptocurrency.quant.mapper.CurrencyBalanceMapper;
@@ -45,11 +46,15 @@ public class CurrencyService {
 
         BigDecimal balance = new BigDecimal(baseBalance).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaBalance));
 
+        ValuationTicker valuationTicker = apiService.getValuationTicker();
+        BigDecimal cny = balance.multiply(valuationTicker.getUsdCnyRate()).setScale(8, RoundingMode.HALF_UP);
+
         String text = site;
         StringBuffer desp = new StringBuffer();
         desp.append("币对")
                 .append(baseName.toUpperCase()).append(quotaName.toUpperCase()).append(CurrencyService.style_flag)
-                .append("持有:").append(balance.setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
+                .append("持有").append(quotaName.toUpperCase()).append(":").append(balance.setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
+                .append("持有CNY:").append(cny).append(CurrencyService.style_flag)
                 .append("现价:").append(marketPrice).append(CurrencyService.style_flag)
                 .append(baseName.toUpperCase()).append(CurrencyService.style_flag)
                 .append("持有:").append(new BigDecimal(baseBalance).setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)

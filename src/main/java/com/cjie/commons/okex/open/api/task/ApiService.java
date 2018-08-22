@@ -1,6 +1,7 @@
 package com.cjie.commons.okex.open.api.task;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.cjie.commons.okex.open.api.bean.spot.param.PlaceOrderParam;
 import com.cjie.commons.okex.open.api.bean.spot.result.*;
 import com.cjie.commons.okex.open.api.service.spot.SpotAccountAPIService;
@@ -19,10 +20,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -478,6 +481,47 @@ public class ApiService {
     public List<OrderInfo> getOrders(String site, String symbol, String states, String after, String limit, String side) throws Exception {
         return spotOrderAPIService.getOrders(site, symbol, states, null, null, null);
 
+    }
+
+    public ValuationTicker getValuationTicker() {
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.add("Referer", "www.okb.com");
+        headers.add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36");
+        HttpEntity requestEntity = new HttpEntity<>(headers);
+
+        String url = "https://www.okb.com/v2/futures/market/indexTicker.do?symbol=f_usd_btc";
+        RestTemplate client = new RestTemplate();
+        log.info(url);
+        client.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        ResponseEntity<String> response = client.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        String body = response.getBody();
+        log.info(body);
+        ResponseResult<ValuationTicker> result = JSON.parseObject(body, new TypeReference<ResponseResult<ValuationTicker>>() {
+        });
+        return result.getData();
+    }
+
+    private BigDecimal getSpotValuation(String site) throws InterruptedException {
+        BigDecimal sum = BigDecimal.ZERO;
+        List<Account> accounts = spotAccountAPIService.getAccounts(site);
+        if (!CollectionUtils.isEmpty(accounts)) {
+            for (Account account : accounts) {
+                if (Double.parseDouble(account.getBalance()) > 0) {
+                    if ("usdt".equalsIgnoreCase(account.getCurrency())) {
+                        Ticker ticker = getTicker(site, "btc", "usdt");
+                        sum = sum.add(new BigDecimal(account.getBalance()).divide(new BigDecimal(ticker.getLast()), 8, RoundingMode.DOWN));
+
+                    } else if (!"btc".equalsIgnoreCase(account.getCurrency())) {
+                        Ticker ticker = getTicker(site, account.getCurrency(), "btc");
+                        sum = sum.add(new BigDecimal(account.getBalance()).multiply(new BigDecimal(ticker.getLast())));
+                    } else {
+                        sum = sum.add(new BigDecimal(account.getBalance()));
+                    }
+                }
+                Thread.sleep(200);
+            }
+        }
+        return sum;
     }
 
     /**
