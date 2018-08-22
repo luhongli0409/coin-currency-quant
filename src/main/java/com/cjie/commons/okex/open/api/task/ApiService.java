@@ -498,8 +498,7 @@ public class ApiService {
         log.info(body);
         ResponseResult<ValuationTicker> result = JSON.parseObject(body, new TypeReference<ResponseResult<ValuationTicker>>() {
         });
-        //return result.getData();
-        return null;
+        return result.getData();
     }
 
     private BigDecimal getSpotValuation(String site) throws InterruptedException {
