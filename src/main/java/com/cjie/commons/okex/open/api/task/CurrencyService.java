@@ -62,7 +62,7 @@ public class CurrencyService {
         WXInfoUtils.sendInfo(text, desp.toString());
 
         CurrencyService.log.info("add user currency");
-        BigDecimal hold = new BigDecimal(quotaAccount.getAvailable()).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaHold));
+        BigDecimal hold = new BigDecimal(baseHold).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaHold));
 
         CurrencyBalance currencyBalance = CurrencyBalance.builder()
                 .site(site)
