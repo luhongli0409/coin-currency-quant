@@ -1,12 +1,7 @@
 package com.cjie.commons.okex.open.api.bean.spot.result;
 
-import lombok.Data;
-import lombok.ToString;
-
 import java.io.Serializable;
 
-@Data
-@ToString
 public class ResponseResult<T> implements Serializable {
 
     private final T data;
