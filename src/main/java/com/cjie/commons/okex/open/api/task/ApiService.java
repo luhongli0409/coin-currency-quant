@@ -110,7 +110,7 @@ public class ApiService {
 
         //买单
         if (new BigDecimal(quotaAccount.getAvailable()).compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal baseAmountpriceBuy = new BigDecimal(quotaAccount.getAvailable()).divide(new BigDecimal(marketPrice));
+            BigDecimal baseAmountpriceBuy = new BigDecimal(quotaAccount.getAvailable()).divide(new BigDecimal(marketPrice), 8, BigDecimal.ROUND_UP);
             if (baseAmountpriceBuy.compareTo(new BigDecimal("10")) > 0) {
                 try {
                     buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, new BigDecimal(0.17));
