@@ -2,10 +2,13 @@ package com.cjie.commons.okex.open.api.task;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.cjie.commons.okex.open.api.bean.account.result.Wallet;
 import com.cjie.commons.okex.open.api.bean.spot.param.PlaceOrderParam;
 import com.cjie.commons.okex.open.api.bean.spot.result.*;
+import com.cjie.commons.okex.open.api.service.account.AccountAPIService;
 import com.cjie.commons.okex.open.api.service.spot.SpotAccountAPIService;
 import com.cjie.commons.okex.open.api.service.spot.SpotOrderAPIServive;
+import com.cjie.commons.okex.open.api.utils.WXInfoUtils;
 import com.cjie.cryptocurrency.quant.mapper.CurrencyOrderMapper;
 import com.cjie.cryptocurrency.quant.mapper.TaskConfigMapper;
 import com.cjie.cryptocurrency.quant.model.APIKey;
@@ -51,6 +54,9 @@ public class ApiService {
 
     @Autowired
     private TaskConfigMapper taskConfigMapper;
+
+    @Autowired
+    private AccountAPIService accountAPIService;
 
     private static String AVERAGE = "-AVERAGE";
 
@@ -499,6 +505,76 @@ public class ApiService {
         ResponseResult<ValuationTicker> result = JSON.parseObject(body, new TypeReference<ResponseResult<ValuationTicker>>() {
         });
         return result.getData();
+    }
+
+    public void collectBalance() throws InterruptedException {
+
+        StringBuilder sb = new StringBuilder();
+
+        String[] sites = new String[]{"coinall", "okex"};
+        BigDecimal sum = BigDecimal.ZERO;
+        ValuationTicker valuationTicker = getValuationTicker();
+        for (String site : sites) {
+            BigDecimal spotAmount = getSpotValuation(site).setScale(8, RoundingMode.DOWN);
+            BigDecimal spotUsdtAmount = spotAmount.multiply(valuationTicker.getLast()).setScale(8, RoundingMode.DOWN);
+            BigDecimal spotCnyAmount = spotUsdtAmount.multiply(valuationTicker.getUsdCnyRate()).setScale(8, RoundingMode.DOWN);
+            sb.append(site).append(":").append("spot:").append(spotAmount)
+                    .append("usdt:").append(spotUsdtAmount)
+                    .append("cny:").append(spotCnyAmount)
+                    .append("\r\n\r\n");
+            sum = sum.add(spotAmount);
+            BigDecimal walletAmount = getWalletValuation(site).setScale(8, RoundingMode.DOWN);
+            BigDecimal walletUsdtAmount = walletAmount.multiply(valuationTicker.getLast()).setScale(8, RoundingMode.DOWN);
+            BigDecimal walletCnyAmount = walletUsdtAmount.multiply(valuationTicker.getUsdCnyRate()).setScale(8, RoundingMode.DOWN);
+            sb.append(site).append(":").append("wallet:").append(walletAmount)
+                    .append("usdt:").append(walletUsdtAmount)
+                    .append("cny:").append(walletCnyAmount)
+                    .append("\r\n\n");
+            sum = sum.add(walletAmount);
+        }
+        sum = sum.setScale(8, RoundingMode.DOWN);
+        BigDecimal usdtSum = sum.multiply(valuationTicker.getLast()).setScale(8, RoundingMode.DOWN);
+        BigDecimal cnySum = usdtSum.multiply(valuationTicker.getUsdCnyRate()).setScale(8, RoundingMode.DOWN);
+        sb.append("all").append(":").append(sum).append("usdt:").append(usdtSum).append("cny:").append(cnySum);
+        WXInfoUtils.sendInfo("balance", sb.toString());
+
+    }
+
+    private BigDecimal getWalletValuation(String site) throws InterruptedException {
+        List<String> noValueCurrencies = new ArrayList<>();
+        noValueCurrencies.add("EON");
+        noValueCurrencies.add("ADD");
+        noValueCurrencies.add("CHL");
+        noValueCurrencies.add("EOP");
+        noValueCurrencies.add("EOX");
+        noValueCurrencies.add("HORUS");
+        noValueCurrencies.add("IQ");
+        noValueCurrencies.add("MEETONE");
+
+
+        BigDecimal sum = BigDecimal.ZERO;
+        List<Wallet> accounts = accountAPIService.getWallet(site);
+        if (!CollectionUtils.isEmpty(accounts)) {
+            for (Wallet account : accounts) {
+                if (noValueCurrencies.contains(account.getCurrency().toUpperCase())) {
+                    continue;
+                }
+                if (account.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+                    if ("usdt".equalsIgnoreCase(account.getCurrency())) {
+                        Ticker ticker = getTicker(site, "btc", "usdt");
+                        sum = sum.add(account.getBalance().divide(new BigDecimal(ticker.getLast()), 8, RoundingMode.DOWN));
+
+                    } else if (!"btc".equalsIgnoreCase(account.getCurrency())) {
+                        Ticker ticker = getTicker(site, account.getCurrency(), "btc");
+                        sum = sum.add(account.getBalance().multiply(new BigDecimal(ticker.getLast())));
+                    } else {
+                        sum = sum.add(account.getBalance());
+                    }
+                }
+                Thread.sleep(200);
+            }
+        }
+        return sum;
     }
 
     private BigDecimal getSpotValuation(String site) throws InterruptedException {

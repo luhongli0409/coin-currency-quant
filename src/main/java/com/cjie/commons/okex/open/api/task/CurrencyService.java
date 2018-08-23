@@ -4,7 +4,6 @@ import com.cjie.commons.okex.open.api.bean.spot.result.Account;
 import com.cjie.commons.okex.open.api.bean.spot.result.Ticker;
 import com.cjie.commons.okex.open.api.bean.spot.result.ValuationTicker;
 import com.cjie.commons.okex.open.api.service.spot.SpotAccountAPIService;
-import com.cjie.commons.okex.open.api.utils.WXInfoUtils;
 import com.cjie.cryptocurrency.quant.mapper.CurrencyBalanceMapper;
 import com.cjie.cryptocurrency.quant.model.CurrencyBalance;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +63,8 @@ public class CurrencyService {
                 .append("持有:").append(new BigDecimal(quotaBalance).setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
                 .append("可用:").append(new BigDecimal(quotaAccount.getAvailable()).setScale(8, RoundingMode.HALF_UP).toString()).append(CurrencyService.style_flag)
                 .append("冻结:").append(new BigDecimal(quotaHold).setScale(8, RoundingMode.HALF_UP).toString());
-        WXInfoUtils.sendInfo(text, desp.toString());
+        //WXInfoUtils.sendInfo(text, desp.toString());
+        apiService.collectBalance();
 
         CurrencyService.log.info("add user currency");
         BigDecimal hold = new BigDecimal(baseHold).multiply(new BigDecimal(marketPrice)).add(new BigDecimal(quotaHold));
