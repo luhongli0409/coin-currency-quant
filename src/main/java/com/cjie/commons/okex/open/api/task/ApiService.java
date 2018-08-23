@@ -100,18 +100,22 @@ public class ApiService {
         Double marketPrice = Double.parseDouble(ticker.getLast());
         //卖单
         BigDecimal baseAmountSell = new BigDecimal(baseAccount.getAvailable());
-        try {
-            sellNotLimit(site, symbol, "limit", baseAmountSell, new BigDecimal(0.212));
-        } catch (Exception e) {
-            ApiService.log.error("交易对卖出错", e);
+        if (baseAmountSell.compareTo(new BigDecimal("10")) > 0) {
+            try {
+                sellNotLimit(site, symbol, "limit", baseAmountSell, new BigDecimal(0.212));
+            } catch (Exception e) {
+                ApiService.log.error("交易对卖出错", e);
+            }
         }
 
         //买单
         BigDecimal baseAmountpriceBuy = new BigDecimal(quotaAccount.getAvailable()).divide(new BigDecimal(marketPrice));
-        try {
-            buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, new BigDecimal(0.17));
-        } catch (Exception e) {
-            ApiService.log.error("交易对买出错", e);
+        if (baseAmountpriceBuy.compareTo(new BigDecimal("10")) > 0) {
+            try {
+                buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, new BigDecimal(0.17));
+            } catch (Exception e) {
+                ApiService.log.error("交易对买出错", e);
+            }
         }
     }
 
