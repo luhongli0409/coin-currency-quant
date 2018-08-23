@@ -109,12 +109,14 @@ public class ApiService {
         }
 
         //买单
-        BigDecimal baseAmountpriceBuy = new BigDecimal(quotaAccount.getAvailable()).divide(new BigDecimal(marketPrice));
-        if (baseAmountpriceBuy.compareTo(new BigDecimal("10")) > 0) {
-            try {
-                buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, new BigDecimal(0.17));
-            } catch (Exception e) {
-                ApiService.log.error("交易对买出错", e);
+        if (new BigDecimal(quotaAccount.getAvailable()).compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal baseAmountpriceBuy = new BigDecimal(quotaAccount.getAvailable()).divide(new BigDecimal(marketPrice));
+            if (baseAmountpriceBuy.compareTo(new BigDecimal("10")) > 0) {
+                try {
+                    buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, new BigDecimal(0.17));
+                } catch (Exception e) {
+                    ApiService.log.error("交易对买出错", e);
+                }
             }
         }
     }
