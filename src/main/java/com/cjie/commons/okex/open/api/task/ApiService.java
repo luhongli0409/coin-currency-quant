@@ -81,6 +81,41 @@ public class ApiService {
     }
 
 
+    /**
+     * 卖出全部
+     *
+     * @param site
+     * @param baseName
+     * @param quotaName
+     * @throws Exception
+     */
+    public void sellAll(String site, String baseName, String quotaName) throws Exception {
+        String symbol = baseName.toUpperCase() + "-" + quotaName.toUpperCase();
+        //查询余额
+        Account baseAccount = getBalance(site, baseName);
+
+        Account quotaAccount = getBalance(site, quotaName);
+
+        Ticker ticker = getTicker(site, baseName, quotaName);
+        Double marketPrice = Double.parseDouble(ticker.getLast());
+        //卖单
+        BigDecimal baseAmountSell = new BigDecimal(baseAccount.getAvailable());
+        try {
+            sellNotLimit(site, symbol, "limit", baseAmountSell, new BigDecimal(0.212));
+        } catch (Exception e) {
+            ApiService.log.error("交易对卖出错", e);
+        }
+
+        //买单
+        BigDecimal baseAmountpriceBuy = new BigDecimal(quotaAccount.getAvailable()).divide(new BigDecimal(marketPrice));
+        try {
+            buyNotLimit(site, symbol, "limit", baseAmountpriceBuy, new BigDecimal(0.17));
+        } catch (Exception e) {
+            ApiService.log.error("交易对买出错", e);
+        }
+    }
+
+
 
     /**
      * 自买自卖交易
