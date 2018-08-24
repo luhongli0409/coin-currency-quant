@@ -29,18 +29,19 @@ public class HongBaoAlgorithm {
         long max = new BigDecimal("0.001").multiply(EXPAND_MULTIPLE).longValue();
         long min = new BigDecimal("0.00000001").multiply(EXPAND_MULTIPLE).longValue();
         long amount = new BigDecimal("0.0001").multiply(EXPAND_MULTIPLE).longValue();
-
-        long[] result = generate(amount, 10, max, min);
-
-        BigDecimal totalValue = new BigDecimal("0");
-        for (int i = 0; i < result.length; i++) {
-            BigDecimal value = new BigDecimal(result[i]).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE);
-            System.out.println(value.toPlainString());
-            totalValue = totalValue.add(value);
+        for (int j = 0; j < 100; j++) {
+            long[] result = generate(amount, 10, max, min);
+            BigDecimal totalValue = new BigDecimal("0");
+            for (int i = 0; i < result.length; i++) {
+                BigDecimal value = new BigDecimal(result[i]).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE);
+                //System.out.println(value.toPlainString());
+                totalValue = totalValue.add(value);
+            }
+            long maxValue = maxValue(result);
+            System.out.println("maxValue :" + new BigDecimal(maxValue).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE).toPlainString());
+            System.out.println("total :" + totalValue.toPlainString());
         }
-        long maxValue = maxValue(result);
-        System.out.println("maxValue :" + new BigDecimal(maxValue).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE).toPlainString());
-        System.out.println("total :" + totalValue.toPlainString());
+
     }
 
     /**
