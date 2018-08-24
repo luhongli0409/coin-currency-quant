@@ -28,7 +28,7 @@ public class HongBaoAlgorithm {
     public static void main(String[] args) {
         long max = new BigDecimal("0.001").multiply(EXPAND_MULTIPLE).longValue();
         long min = new BigDecimal("0.00000001").multiply(EXPAND_MULTIPLE).longValue();
-        long amount = new BigDecimal("0.00000010").multiply(EXPAND_MULTIPLE).longValue();
+        long amount = new BigDecimal("0.0001").multiply(EXPAND_MULTIPLE).longValue();
 
         long[] result = generate(amount, 10, max, min);
 
@@ -38,6 +38,8 @@ public class HongBaoAlgorithm {
             System.out.println(value.toPlainString());
             totalValue = totalValue.add(value);
         }
+        long maxValue = maxValue(result);
+        System.out.println("maxValue :" + new BigDecimal(maxValue).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE).toPlainString());
         System.out.println("total :" + totalValue.toPlainString());
     }
 
@@ -117,5 +119,16 @@ public class HongBaoAlgorithm {
 
     public static long nextLong(long min, long max) {
         return RandomUtils.nextLong(min, max);
+    }
+
+    public static long maxValue(long[] array) {
+        long maxIndex = array[0];
+        //遍历循环数组
+        for (int i = 0; i < array.length; i++) {
+            if (maxIndex < array[i]) {
+                maxIndex = array[i];
+            }
+        }
+        return maxIndex;
     }
 }
