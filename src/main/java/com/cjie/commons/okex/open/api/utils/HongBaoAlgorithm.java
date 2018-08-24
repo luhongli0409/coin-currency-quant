@@ -1,9 +1,8 @@
 package com.cjie.commons.okex.open.api.utils;
 
+import org.apache.commons.lang3.RandomUtils;
+
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -15,24 +14,31 @@ public class HongBaoAlgorithm {
 
     private static Random random = new Random();
 
+    //小数点位数
+    private static int FLOOR_NUM = 8;
+
+    private static int ROUNDING_MODE = BigDecimal.ROUND_HALF_DOWN;
+
+    private static BigDecimal EXPAND_MULTIPLE = new BigDecimal("100000000");
+
     static {
         random.setSeed(System.currentTimeMillis());
     }
 
-    public static void main1(String[] args) {
-        long max = 20;
-        long min = 1;
-        long[] result = generate(100, 10, max, min);
-        long total = 0;
-        for (int i = 0; i < result.length; i++) {
-            total += result[i];
-        }
-        //检查生成的红包的总额是否正确
-        System.out.println("total:" + total);
+    public static void main(String[] args) {
+        long max = new BigDecimal("0.001").multiply(EXPAND_MULTIPLE).longValue();
+        long min = new BigDecimal("0.00000001").multiply(EXPAND_MULTIPLE).longValue();
+        long amount = new BigDecimal("0.00000010").multiply(EXPAND_MULTIPLE).longValue();
 
+        long[] result = generate(amount, 10, max, min);
+
+        BigDecimal totalValue = new BigDecimal("0");
         for (int i = 0; i < result.length; i++) {
-            System.out.println(result[i]);
+            BigDecimal value = new BigDecimal(result[i]).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE);
+            System.out.println(value.toPlainString());
+            totalValue = totalValue.add(value);
         }
+        System.out.println("total :" + totalValue.toPlainString());
     }
 
     /**
@@ -44,7 +50,8 @@ public class HongBaoAlgorithm {
      * @return
      */
     static long xRandom(long min, long max) {
-        return sqrt(nextLong(sqr(max - min)));
+        long randdomValue = (max - min) == 0 ? min : max - min;
+        return sqrt(nextLong(sqr(randdomValue)));
     }
 
 
@@ -105,77 +112,10 @@ public class HongBaoAlgorithm {
     }
 
     public static long nextLong(long n) {
-        return random.nextInt((int) n);
+        return RandomUtils.nextLong(1, n);
     }
 
     public static long nextLong(long min, long max) {
-        return random.nextInt((int) (max - min + 1)) + min;
-    }
-
-    /**
-     *    * 计算每人获得红包金额;最小每人0.01元
-     *    * @param mmm 红包总额
-     *    * @param number 人数
-     *    * @return
-     *    
-     */
-    public static List<BigDecimal> math(BigDecimal mmm, int number) {
-        if (mmm.doubleValue() < number * 0.01) {
-            return null;
-        }
-        Random random = new Random();
-        // 金钱，按分计算 10块等于 1000分
-        int money = mmm.multiply(BigDecimal.valueOf(100)).intValue();
-        // 随机数总额
-        double count = 0;
-        // 每人获得随机点数
-        double[] arrRandom = new double[number];
-        // 每人获得钱数
-        List<BigDecimal> arrMoney = new ArrayList<>(number);
-        // 循环人数 随机点
-        for (int i = 0; i < arrRandom.length; i++) {
-            int r = random.nextInt((number) * 99) + 1;
-            count += r;
-            arrRandom[i] = r;
-        }
-        // 计算每人拆红包获得金额
-        int c = 0;
-        for (int i = 0; i < arrRandom.length; i++) {
-            // 每人获得随机数相加 计算每人占百分比
-            Double x = new Double(arrRandom[i] / count);
-            // 每人通过百分比获得金额
-            int m = (int) Math.floor(x * money);
-            // 如果获得 0 金额，则设置最小值 1分钱
-            if (m == 0) {
-                m = 1;
-            }
-            // 计算获得总额
-            c += m;
-            // 如果不是最后一个人则正常计算
-            if (i < arrRandom.length - 1) {
-                arrMoney.add(new BigDecimal(m).divide(new BigDecimal(100)));
-            } else {
-                // 如果是最后一个人，则把剩余的钱数给最后一个人
-                arrMoney.add(new BigDecimal(money - c + m).divide(new BigDecimal(100)));
-            }
-        }
-        // 随机打乱每人获得金额
-        Collections.shuffle(arrMoney);
-        return arrMoney;
-    }
-
-    public static void main(String[] args) {
-        for (int i = 0; i < 10; i++) {
-            List<BigDecimal> moneys = math(BigDecimal.valueOf(10), 6);
-            if (moneys != null) {
-                BigDecimal b = new BigDecimal(0);
-                for (BigDecimal bigDecimal : moneys) {
-                    System.out.print(bigDecimal + "元  ");
-                    b = b.add(bigDecimal);
-                }
-                System.out.print("  总额：" + b + "元 ");
-                System.out.println();
-            }
-        }
+        return RandomUtils.nextLong(min, max);
     }
 }
