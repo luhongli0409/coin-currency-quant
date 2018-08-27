@@ -30,7 +30,7 @@ public class HongBaoAlgorithm {
         long min = new BigDecimal("0.00000001").multiply(EXPAND_MULTIPLE).longValue();
         long amount = new BigDecimal("0.0001").multiply(EXPAND_MULTIPLE).longValue();
         long amountValue = new BigDecimal("0.0001").longValue();
-        for (int j = 0; j < 1000; j++) {
+        for (int j = 0; j < 100; j++) {
             long[] result = generate(amount, 10, max, min);
             BigDecimal totalValue = new BigDecimal("0");
             for (int i = 0; i < result.length; i++) {
@@ -41,9 +41,11 @@ public class HongBaoAlgorithm {
             long maxValue = maxValue(result);
             String maxValueStr = new BigDecimal(maxValue).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE).toPlainString();
             int valueCount = valueCount(result, maxValue);
+            if (valueCount > 1) {
+                System.out.println("**************************************************");
+            }
             String totlaStr = totalValue.toPlainString();
-            System.out.println(String.format("total: %s ; isEqual : %s ; maxValue : %s ; valueCount : %s ",
-                    totlaStr, amountValue == totalValue.longValue(), maxValueStr, valueCount));
+            System.out.println(String.format("total: %s ; isEqual : %s ; maxValue : %s ; valueCount : %s ", totlaStr, amountValue == totalValue.longValue(), maxValueStr, valueCount));
         }
 
     }
