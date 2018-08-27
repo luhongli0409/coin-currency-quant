@@ -29,17 +29,21 @@ public class HongBaoAlgorithm {
         long max = new BigDecimal("0.001").multiply(EXPAND_MULTIPLE).longValue();
         long min = new BigDecimal("0.00000001").multiply(EXPAND_MULTIPLE).longValue();
         long amount = new BigDecimal("0.0001").multiply(EXPAND_MULTIPLE).longValue();
-        for (int j = 0; j < 100; j++) {
+        long amountValue = new BigDecimal("0.0001").longValue();
+        for (int j = 0; j < 1000; j++) {
             long[] result = generate(amount, 10, max, min);
             BigDecimal totalValue = new BigDecimal("0");
             for (int i = 0; i < result.length; i++) {
                 BigDecimal value = new BigDecimal(result[i]).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE);
-                //System.out.println(value.toPlainString());
+                //System.out.print(value.toPlainString());
                 totalValue = totalValue.add(value);
             }
             long maxValue = maxValue(result);
-            System.out.println("maxValue :" + new BigDecimal(maxValue).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE).toPlainString());
-            System.out.println("total :" + totalValue.toPlainString());
+            String maxValueStr = new BigDecimal(maxValue).divide(EXPAND_MULTIPLE, FLOOR_NUM, ROUNDING_MODE).toPlainString();
+            int valueCount = valueCount(result, maxValue);
+            String totlaStr = totalValue.toPlainString();
+            System.out.println(String.format("total: %s ; isEqual : %s ; maxValue : %s ; valueCount : %s ",
+                    totlaStr, amountValue == totalValue.longValue(), maxValueStr, valueCount));
         }
 
     }
@@ -53,8 +57,7 @@ public class HongBaoAlgorithm {
      * @return
      */
     static long xRandom(long min, long max) {
-        long randdomValue = (max - min) == 0 ? min : max - min;
-        return sqrt(nextLong(sqr(randdomValue)));
+        return sqrt(nextLong(sqr((max - min) == 0 ? min : max - min)));
     }
 
 
@@ -131,5 +134,15 @@ public class HongBaoAlgorithm {
             }
         }
         return maxIndex;
+    }
+
+    public static int valueCount(long[] array, long value) {
+        int count = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (value == array[i]) {
+                count++;
+            }
+        }
+        return count;
     }
 }
